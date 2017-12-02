@@ -8,12 +8,28 @@ module LARVIEW
 	include("./utilities.jl")
 
 
+	"""
+	LAR model (V,CV) -> PyPlasm Viewer
+	Display using the HPC object translating (V,CV).
+
+	HPC = (Hierarchica Polyhedral Complex) is the python Class of Pyplasm
+	geometric values.
+	"""
 	function view(V::Array{Any,1},CV::Array{Any,1})
 		V = hcat(V[1],V...)
 		W = [Any[V[h,k] for h=1:size(V,1)] for k=1:size(V,2)]
 		p.VIEW(p.STRUCT(p.MKPOLS(PyObject([W,CV,[]]))))
 	end
 
+
+	"""
+	LAR model (V::vertices,CV::cells) -> PyPlasm Viewer
+	
+	Display using the HPC object translating (V,CV).
+
+	HPC = (Hierarchica Polyhedral Complex) is the python Class of Pyplasm
+	geometric values.
+	"""
 	function view(V::Array{Float64,2},CV::Array{Array{Int,1},1})
 		V = hcat(V[:,1],[V[:,k] for k in 1:size(V,2)]...)
 		W = [Any[V[h,k] for h=1:size(V,1)] for k=1:size(V,2)]
@@ -21,6 +37,14 @@ module LARVIEW
 	end
 
 
+	"""
+	LAR model (V::vertices,CV::cells) -> PyPlasm Viewer
+	
+	Display exploded sequence of HPCs corresponding to cells.
+	
+	HPC = (Hierarchica Polyhedral Complex) is the python Class of Pyplasm
+	geometric values.
+	"""
 	function viewexploded(V::Array{Any,1},CV::Array{Any,1})
 		V = hcat(V[1],V...)
 		W = [Any[V[h,k] for h=1:size(V,1)] for k=1:size(V,2)]
@@ -29,6 +53,14 @@ module LARVIEW
 		p.VIEW(hpc)
 	end
 
+	"""
+	LAR model (V::vertices,CV::cells) -> PyPlasm Viewer
+	
+	Display exploded sequence of HPCs corresponding to cells.
+	
+	HPC = (Hierarchica Polyhedral Complex) is the python Class of Pyplasm
+	geometric values.
+	"""
 	function viewexploded(V::Array{Any,2},CV::Array{Any,2})
 		Z = hcat(V[:,1],V)
 		W = [Any[Z[h,k] for h=1:size(Z,1)] for k=1:size(Z,2)]
@@ -39,6 +71,14 @@ module LARVIEW
 		p.VIEW(hpc)
 	end
 
+	"""
+	LAR model (V::vertices,CV::cells) -> PyPlasm Viewer
+	
+	Display exploded sequence of HPCs corresponding to cells.
+	
+	HPC = (Hierarchica Polyhedral Complex) is the python Class of Pyplasm
+	geometric values.
+	"""
 	function viewexploded(V::Array{Int64,2},CV::Array{Array{Int64,1},1})
 		Z = hcat(V[:,1],V)
 		W = [Any[Z[h,k] for h=1:size(Z,1)] for k=1:size(Z,2)]
@@ -48,6 +88,14 @@ module LARVIEW
 		p.VIEW(hpc)
 	end
 
+	"""
+	LAR model (V::vertices,CV::cells) -> PyPlasm Viewer
+	
+	Display exploded sequence of HPC objects corresponding to cells.
+	
+	HPC = (Hierarchica Polyhedral Complex) is the python Class of Pyplasm
+	geometric values.
+	"""
 	function viewexploded(V::Array{Float64,2},CV::Array{Array{Int64,1},1})
 		Z = hcat(V[:,1],V)
 		W = [Any[Z[h,k] for h=1:size(Z,1)] for k=1:size(Z,2)]
@@ -57,6 +105,14 @@ module LARVIEW
 		p.VIEW(hpc)
 	end
 
+	"""
+	`larmodel, scaling=1.0`` -> PyPlasm Viewer, where all dimensions of 3D model are shown.
+	
+	Display numbered sequence of `HPC`` objects corresponding to cells with different colors.
+	
+	`HPC`` = (Hierarchica Polyhedral Complex) is the python Class of `Pyplasm``
+	geometric values.
+	"""
 	function viewnumbered(larmodel,scaling=1.0)
 		V,cells = larmodel
 		VV,EV,FV,CV = cells
