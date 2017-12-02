@@ -1,6 +1,5 @@
 using LARVIEW
 
-
 geom_0 = hcat([[x] for x=0.:10]...)
 topol_0 = [[i,i+1] for i=1:9]
 geom_1 = hcat([[0.],[1.],[2.]]...)
@@ -16,7 +15,7 @@ LARVIEW.view(model_3...)
 LARVIEW.viewexploded(model_3...)
 LARVIEW.viewexploded(model_3[1],model_3[2])
 
-shape = (40,20,10)
+shape = (10,10,2)
 cubes = LARLIB.larCuboids(shape,true)
 V,FV = cubes[1],cubes[2][3]
 LARVIEW.viewexploded(V,FV)
@@ -38,5 +37,6 @@ V3 = [π/16 0 0; 0 2π/32 0; 0 0 1] * V3
 W = [V3[:,k]-[π/2,π,1/2] for k=1:size(V3,2)] 
 Z = hcat( map(p->let (u,v,w) = p; [w*cos(u)*cos(v); w*cos(u)*sin(v); w*sin(u)] end, W) ...)
 LARVIEW.viewexploded(V3,CV)
-LARVIEW.view(Z,CV)
+LARVIEW.viewexploded(Z,CV)
+
 
