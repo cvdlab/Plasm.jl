@@ -3,7 +3,7 @@
 Useful module to visualize [LARLIB.jl](https://github.com/cvdlab/LARLIB.jl) structures via [PyPLASM](https://github.com/plasm-language/pyplasm)
 
 ### Version
-0.1.0
+0.2.0
 
 ## Installing
 
