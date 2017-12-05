@@ -4,7 +4,7 @@ module LARVIEW
 	using PyCall
 	@pyimport larlib as p
 
-	include("./src/utilities.jl")
+	include("./utilities.jl")
 	import Base.view
 
 
