@@ -24,7 +24,7 @@ module LARVIEW
 	end
 
 	# Display an  `HPC` (Hierarchica Polyhedral Complex) object with the `PyPlasm` viewer
-	view(hpc) = p.VIEW(hpc)
+	view(hpc) = p.VIEW(lar2hpc(V,CV))
 
 
 
