@@ -11,7 +11,7 @@ model_2 = LARLIB.larModelProduct(model_0, model_1)
 model_3 = LARLIB.larModelProduct(model_2, model_1)
 
 
-LARVIEW.view(model_3...)
+LARVIEW.view(LARVIEW.lar2hpc(model_3...))
 LARVIEW.viewexploded(model_3...)
 LARVIEW.viewexploded(model_3[1],model_3[2])
 
