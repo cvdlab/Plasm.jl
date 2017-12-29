@@ -199,8 +199,55 @@ end
 V,FV,EV = collection2model(collection)
 V,bases,coboundaries = chaincomplex(V,FV,EV)
 EV,FV,CV = bases
+cscEV,cscFE,cscCF = coboundaries
 LARVIEW.viewexploded(V,EV)
 LARVIEW.viewexploded(V,FV)
 LARVIEW.viewexploded(V,CV)
 
+####
 
+function facetriangulation(FV,cscFE,cscCF)
+	function facetrias(f)
+		vs = [V[:,v] for v in FV[f]]
+		vs_indices = [v for v in FV[f]]
+		vdict = Dict([(i,index) for (i,index) in enumerate(vs_indices)])
+		dictv = Dict([(index,i) for (i,index) in enumerate(vs_indices)])
+		es = findn(cscFE[f,:])
+	
+		vts = [v-vs[1] for v in vs]
+	
+		v1 = vts[2]
+		v2 = vts[3]
+		v3 = cross(v1,v2)
+		err, i = 1e-8, 1
+		while norm(v3) < err
+			v2 = vts[3+i]
+			i += 1
+			v3 = cross(v1,v2)
+		end	
+	
+		M = [v1 v2 v3]
+		vs_2D = hcat([(inv(M)*v)[1:2] for v in vts]...)'
+		pointdict = Dict([(vs_2D[k,:],k) for k=1:size(vs_2D,1)])
+		edges = hcat([[dictv[v] for v in EV[e]]  for e in es]...)'
+	
+		trias = TRIANGLE.constrained_triangulation_vertices(
+			vs_2D, collect(1:length(vs)), edges)
+		triangles = [[pointdict[t[1,:]],pointdict[t[2,:]],pointdict[t[3,:]]] 
+			for t in trias]
+		return [[vdict[t[1]],vdict[t[2]],vdict[t[3]]] for t in triangles]
+	end
+	return facetrias
+end
+
+function triangulate(FV,cscFE,cscCF)
+	mktriangles = facetriangulation(FV,cscFE,cscCF)
+	TV = Array{Int64,1}[]
+	for f=1:length(FV)
+		append!(TV, mktriangles(f))
+	end
+	return TV
+end
+
+TV = triangulate(FV,cscFE,cscCF)
+LARVIEW.viewexploded(V,TV)
