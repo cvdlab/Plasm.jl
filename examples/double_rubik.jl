@@ -227,12 +227,14 @@ function facetriangulation(FV,cscFE,cscCF)
 		end	
 	
 		M = [v1 v2 v3]
+
 		vs_2D = hcat([(inv(M)*v)[1:2] for v in vts]...)'
 		pointdict = Dict([(vs_2D[k,:],k) for k=1:size(vs_2D,1)])
 		edges = hcat([[dictv[v] for v in EV[e]]  for e in es]...)'
 	
 		trias = TRIANGLE.constrained_triangulation_vertices(
 			vs_2D, collect(1:length(vs)), edges)
+
 		triangles = [[pointdict[t[1,:]],pointdict[t[2,:]],pointdict[t[3,:]]] 
 			for t in trias]
 		return [[vdict[t[1]],vdict[t[2]],vdict[t[3]]] for t in triangles]
@@ -240,14 +242,52 @@ function facetriangulation(FV,cscFE,cscCF)
 	return facetrias
 end
 
-function triangulate(FV,cscFE,cscCF)
+function triangulate(cf,FV,cscFE,cscCF)
 	mktriangles = facetriangulation(FV,cscFE,cscCF)
 	TV = Array{Int64,1}[]
-	for f=1:length(FV)
-		append!(TV, mktriangles(f))
+	for (f,sign) in zip(cf[1],cf[2])
+		triangles = mktriangles(f)
+		if sign == 1
+			append!(TV,triangles )
+		elseif sign == -safa1
+			append!(TV,[[t[2],t[1],t[3]] for t in triangles] )
+		end
 	end
 	return TV
 end
 
-TV = triangulate(FV,cscFE,cscCF)
+TV = triangulate((1:length(FV),ones(length(FV))),FV,cscFE,cscCF)
 LARVIEW.viewexploded(V,TV)
+
+
+####
+
+function map_3cells_to_localbases(CV,FV,cscCF,cscFE)
+	winged_3cells = []
+	for c=1:length(CV)
+		cf = findnz(cscCF[c+1,:])
+		tv = triangulate(cf,FV,cscFE,cscCF)
+		vs = sort(collect(Set(hcat(tv...))))
+		vsdict = Dict([(v,k) for (k,v) in enumerate(vs)])
+		tvs = [[vsdict[t[1]],vsdict[t[2]],vsdict[t[3]]] for t in tv]
+		tvt = csc_tvs * csc_tvs'
+		wingedtrias = [[t for (t,v) in zip(findnz(tvt[:,k])...) if v==2] 
+			for k=1:size(tvt,2)]
+		v = hcat([V[:,w] for w in vs]...)
+		winged_c = [v,tvs,wingedtrias]
+		#LARVIEW.viewexploded(v,tvs)
+		append!(winged_3cells,[winged_c])
+	end
+	return winged_3cells
+end
+
+winged_3cells = map_3cells_to_localbases(CV,FV,cscCF,cscFE)
+
+v,tv,tt = winged_3cells[2]
+hpc = LARVIEW.lar2hpc(v,tv)
+p.VIEW(hpc)
+LARVIEW.viewexploded(v,tv)
+
+
+
+
