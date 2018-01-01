@@ -249,7 +249,7 @@ function triangulate(cf,FV,cscFE,cscCF)
 		triangles = mktriangles(f)
 		if sign == 1
 			append!(TV,triangles )
-		elseif sign == -safa1
+		elseif sign == -1
 			append!(TV,[[t[2],t[1],t[3]] for t in triangles] )
 		end
 	end
@@ -270,6 +270,7 @@ function map_3cells_to_localbases(CV,FV,cscCF,cscFE)
 		vs = sort(collect(Set(hcat(tv...))))
 		vsdict = Dict([(v,k) for (k,v) in enumerate(vs)])
 		tvs = [[vsdict[t[1]],vsdict[t[2]],vsdict[t[3]]] for t in tv]
+		csc_tvs = characteristicMatrix(tvs)
 		tvt = csc_tvs * csc_tvs'
 		wingedtrias = [[t for (t,v) in zip(findnz(tvt[:,k])...) if v==2] 
 			for k=1:size(tvt,2)]
@@ -283,11 +284,15 @@ end
 
 winged_3cells = map_3cells_to_localbases(CV,FV,cscCF,cscFE)
 
-v,tv,tt = winged_3cells[2]
-hpc = LARVIEW.lar2hpc(v,tv)
-p.VIEW(hpc)
+v,tv,tt = winged_3cells[3]
+#hpc = LARVIEW.lar2hpc(v,tv)
+#p.VIEW(hpc)
 LARVIEW.viewexploded(v,tv)
 
+####
 
+function orient_winged_triangle(v,tv,tt)
+
+end
 
 
