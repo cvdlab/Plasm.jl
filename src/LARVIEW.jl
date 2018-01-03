@@ -23,10 +23,16 @@ module LARVIEW
 		hpc = p.STRUCT(p.MKPOLS(PyObject([W,CV,[]])))
 	end
 
+	# LAR model `(V::vertices,CV::cells),FV::cells)` -> py model
+	function lar2py(V::Array{Float64,2}, CV::Array{Array{Int,1},1}, 
+					FV::Array{Array{Int,1},1})
+		V = hcat(V[:,1],[V[:,k] for k in 1:size(V,2)]...)
+		W = [Any[V[h,k] for h=1:size(V,1)] for k=1:size(V,2)]
+		PyObject(W),PyObject(CV),PyObject(FV)
+	end
+
 	# Display an  `HPC` (Hierarchica Polyhedral Complex) object with the `PyPlasm` viewer
 	view(hpc) = p.VIEW(lar2hpc(V,CV))
-
-
 
 
 	# LAR model `(V::vertices,CV::cells)` -> exploded `HPC` object

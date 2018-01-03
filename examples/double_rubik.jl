@@ -2,6 +2,8 @@
 #@everywhere using LARVIEW
 
 using LARVIEW
+using PyCall
+@pyimport larlib as p
 
 # Characteristic matrix M_2, i.e. M(FV)
 function characteristicMatrix(FV)
@@ -51,7 +53,7 @@ end
 
 #uboundary2(FV,EV)
 
-# signed operator ∂_2: C_2 -> C_1
+# signed operator _2: C_2 -> C_1
 function boundary2(FV,EV)
 	sp_u_boundary2 = uboundary2(FV,EV)
 	larEV = characteristicMatrix(EV)
@@ -260,39 +262,42 @@ TV = triangulate((1:length(FV),ones(length(FV))),FV,cscFE,cscCF)
 LARVIEW.viewexploded(V,TV)
 
 
-####
+########
+
 
 function map_3cells_to_localbases(CV,FV,cscCF,cscFE)
-	winged_3cells = []
+	local3cells = []
 	for c=1:length(CV)
 		cf = findnz(cscCF[c+1,:])
 		tv = triangulate(cf,FV,cscFE,cscCF)
 		vs = sort(collect(Set(hcat(tv...))))
 		vsdict = Dict([(v,k) for (k,v) in enumerate(vs)])
 		tvs = [[vsdict[t[1]],vsdict[t[2]],vsdict[t[3]]] for t in tv]
-		csc_tvs = characteristicMatrix(tvs)
-		tvt = csc_tvs * csc_tvs'
-		wingedtrias = [[t for (t,v) in zip(findnz(tvt[:,k])...) if v==2] 
-			for k=1:size(tvt,2)]
 		v = hcat([V[:,w] for w in vs]...)
-		winged_c = [v,tvs,wingedtrias]
-		#LARVIEW.viewexploded(v,tvs)
-		append!(winged_3cells,[winged_c])
+		cell = [v,tvs]
+		append!(local3cells,[cell])
 	end
-	return winged_3cells
+	return local3cells
 end
 
-winged_3cells = map_3cells_to_localbases(CV,FV,cscCF,cscFE)
-
-v,tv,tt = winged_3cells[3]
-#hpc = LARVIEW.lar2hpc(v,tv)
-#p.VIEW(hpc)
-LARVIEW.viewexploded(v,tv)
-
-####
-
-function orient_winged_triangle(v,tv,tt)
-
+function viewsolidcells(sx=1.2, sy=1.2, sz=1.2)
+	scaling = [sx; sy; sz]
+	function viewsolidcells0(CV,FV,cscCF,cscFE)
+		local3cells = map_3cells_to_localbases(CV,FV,cscCF,cscFE)
+		hpcs = Any[]
+		for local3cell in local3cells
+			v,tv = local3cell
+			centroid = sum(v,2)/size(v,2)
+			scaledcentroid = scaling.*centroid
+			translation = scaledcentroid - centroid
+			w = v .+ translation
+			hpc = p.SOLIDIFY(LARVIEW.lar2hpc(w,tv))
+			append!(hpcs, [hpc])
+		end
+		p.VIEW(p.STRUCT(hpcs))
+		return viewsolidcells0
+	end
 end
 
 
+viewsolidcells(1.5,1.5,3.)(CV,FV,cscCF,cscFE)
