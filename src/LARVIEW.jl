@@ -23,14 +23,6 @@ module LARVIEW
 		hpc = p.STRUCT(p.MKPOLS(PyObject([W,CV,[]])))
 	end
 
-	# LAR model `(V::vertices,CV::cells),FV::cells)` -> py model
-	function lar2py(V::Array{Float64,2}, CV::Array{Array{Int,1},1}, 
-					FV::Array{Array{Int,1},1})
-		V = hcat(V[:,1],[V[:,k] for k in 1:size(V,2)]...)
-		W = [Any[V[h,k] for h=1:size(V,1)] for k=1:size(V,2)]
-		PyObject(W),PyObject(CV),PyObject(FV)
-	end
-
 	# Display an  `HPC` (Hierarchica Polyhedral Complex) object with the `PyPlasm` viewer
 	view(hpc) = p.VIEW(lar2hpc(V,CV))
 
@@ -153,5 +145,24 @@ module LARVIEW
 		mat*V
 	end
 
+	# Visualize solid cells
+	function viewsolidcells(sx=1.2, sy=1.2, sz=1.2)
+		scaling = [sx; sy; sz]
+		function viewsolidcells0(V,CV,FV,EV,cscCF,cscFE)
+			local3cells = LARLIB.map_3cells_to_localbases(V,CV,FV,EV,cscCF,cscFE)
+			hpcs = Any[]
+			for local3cell in local3cells
+				v,tv = local3cell
+				centroid = sum(v,2)/size(v,2)
+				scaledcentroid = scaling.*centroid
+				translation = scaledcentroid - centroid
+				w = v .+ translation
+				hpc = p.SOLIDIFY(LARVIEW.lar2hpc(w,tv))
+				append!(hpcs, [hpc])
+			end
+			p.VIEW(p.STRUCT(hpcs))
+			return viewsolidcells0
+		end
+	end
 
 end
