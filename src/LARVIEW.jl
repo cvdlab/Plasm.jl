@@ -26,6 +26,45 @@ module LARVIEW
 	# Display an  `HPC` (Hierarchica Polyhedral Complex) object with the `PyPlasm` viewer
 	view(hpc) = p.VIEW(lar2hpc(V,CV))
 
+	"""
+	larView(model)
+	
+	Show a LAR `model` object, i.e. a pair `(V, CV)`, using the `pyplasm` interactive viewer.
+	The *LAR* model (geometry, topology) is transformed into an *HPC* (Hierarchical POlyhedral Complex), introduced by the `PLaSM` language.
+
+	# Example
+	```julia
+	julia> typeof(model)
+	Tuple{Array{Float64, 2}, Array{Array{Int64, 1}, 1}}
+
+	julia> model = hollowBall(1, 2, pi/2, pi/2)([6, 6, 4])
+	([0.5 0.625 … 0.875 1.0; -0.5 -0.625 … 0.875 1.0; -0.707107 -0.883883 … 1.23744 1.41421], 
+	Array{Int64, 1}[[1, 2, 6, 7, 96, 97, 101, 102], [2, 3, 7, 8, 97, 98, 102, 103], 
+	[...]
+
+	julia> larView(model)
+	[...]
+	```
+	"""
+	function larView(model::Tuple{Array{Float64, 2}, Array{Array{Int64, 1}, 1}})
+		p.VIEW(lar2hpc(model...))
+	end
+	function larView(model::Tuple{Array{Array{Float64,N} where N,1},Array{Array{Int64,1},1}})
+		V,CV = model
+		V = hcat(V...)
+		p.VIEW(lar2hpc(V,CV))
+	end
+	function larView(model::Array{Any,1})
+		HPC_value_array = [LARVIEW.lar2hpc(item[1],item[2]) for item in model]
+		p.VIEW(p.STRUCT(HPC_value_array))
+	end
+	function larView(V::Array{Float64, 2}, CV::Array{Array{Int64, 1}, 1})
+		p.VIEW(lar2hpc(V, CV))
+	end
+	function larView(V::Array{Int64, 2}, CV::Array{Array{Int64, 1}, 1})
+		W = convert(Array{Float64,2}, V)
+		p.VIEW(lar2hpc(W, CV))
+	end
 
 	# LAR model `(V::vertices,CV::cells)` -> exploded `HPC` object
 	function lar2exploded_hpc(V::Array{Any,1},CV::Array{Any,1})
@@ -157,12 +196,11 @@ module LARVIEW
 				scaledcentroid = scaling.*centroid
 				translation = scaledcentroid - centroid
 				w = v .+ translation
-				hpc = p.SOLIDIFY(LARVIEW.lar2hpc(w,tv))
+				hpc = p.SOLIDIFY(lar2hpc(w,tv))
 				append!(hpcs, [hpc])
 			end
 			p.VIEW(p.STRUCT(hpcs))
 			return viewsolidcells0
 		end
 	end
-
 end
