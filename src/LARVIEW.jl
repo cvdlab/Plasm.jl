@@ -2,7 +2,7 @@ module LARVIEW
 
 	using LARLIB
 	using PyCall
-	@pyimport larlib as p
+	@pyimport pyplasm as p
 
 	include("./utilities.jl")
 	import Base.view
