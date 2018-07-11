@@ -71,6 +71,28 @@ module LARVIEW
 
 
 
+	function larView(model::Tuple{Array{Float64, 2}, Array{Array{Int64, 1}, 1}})
+		p.VIEW(LARVIEW.lar2hpc(model...))
+	end
+	function larView(model::Tuple{Array{Array{Float64,N} where 
+	N,1},Array{Array{Int64,1},1}})
+		V,CV = model
+		V = hcat(V...)
+		p.VIEW(LARVIEW.lar2hpc(V,CV))
+	end
+	function larView(model::Array{Any,1})
+		HPC_value_array = [LARVIEW.lar2hpc(item[1],item[2]) for item in model]
+		p.VIEW(p.STRUCT(HPC_value_array))
+	end
+	function larView(V::Array{Float64, 2}, CV::Array{Array{Int64, 1}, 1})
+		p.VIEW(LARVIEW.lar2hpc(V, CV))
+	end
+	function larView(V::Array{Int64, 2}, CV::Array{Array{Int64, 1}, 1})
+		W = convert(Array{Float64,2}, V)
+		p.VIEW(LARVIEW.lar2hpc(W, CV))
+	end
+
+
 
 	# LAR `model` ->  numbered `HPC` obyect
 	function lar2numbered_hpc(larmodel,scaling=1.0)
