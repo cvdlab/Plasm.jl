@@ -100,11 +100,11 @@ module LARVIEW
 	"""
 		cuboidGrid(shape::Array{Int64,1}[, full=false])::Union{LAR,LAR_Model}
 
-	compute a cellular complex (mesh) with *cuboidal cells* of either `LAR_Model` 
+	compute a *cellular complex* (mesh) with *cuboidal cells* of either `LAR_Model` 
 	or `LAR` type, depending of the value of optional `full` parameter. The default is
 	for returning a `LAR` value, i.e. a pair `(Points, Cells)`.
-	The dimension of `Cells` is the one of the number `M` of rows of 
-	cell `POints`. The dimensions of `Array{Cells,1}` in `LAR_Model` run 
+	The *dimension* of `Cells` is the one of the number `M` of rows of 
+	cell `Points`. The dimensions of `Array{Cells,1}` in `LAR_Model` run 
 	from ``1`` to ``M``.
 	"""
 	cuboidGrid = LARLIB.larCuboids
