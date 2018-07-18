@@ -71,14 +71,23 @@ module LARVIEW
 	
 	
 	"""
-		LAR_Model = Tuple{Points,Array{Cells,1}}
+		LARmodel = Tuple{Points,Array{Cells,1}}
 		
 	Alias declation of LAR-specific data structure.
-	`LAR_Model` is a pair (*Geometry*, *Topology*), where *Geometry* is stored as 
+	`LARmodel` is a pair (*Geometry*, *Topology*), where *Geometry* is stored as 
 	`Points`, and *Topology* is stored as `Array` of `Cells`. The number of `Cells` 
 	values may vary from `1` to `N+1`.
 	"""
-	const LAR_Model = Tuple{Points,Array{Cells,1}}
+	const LARmodel = Tuple{Points,Array{Cells,1}}
+	
+	
+	"""
+		LAR = Tuple{Points,Cells}
+		
+	Alias declation of LAR-specific data structure.
+	`LAR` is a pair (*Geometry*, *Topology*), where *Geometry* is stored as 
+	`Points`, and *Topology* is stored as `Cells`. 
+	"""
 	const LAR = Tuple{Points,Cells}
 	
 	
@@ -98,13 +107,13 @@ module LARVIEW
 
 
 	"""
-		cuboidGrid(shape::Array{Int64,1}[, full=false])::Union{LAR,LAR_Model}
+		cuboidGrid(shape::Array{Int64,1}[, full=false])::Union{LAR,LARmodel}
 
-	compute a *cellular complex* (mesh) with *cuboidal cells* of either `LAR_Model` 
+	compute a *cellular complex* (mesh) with *cuboidal cells* of either `LARmodel` 
 	or `LAR` type, depending of the value of optional `full` parameter. The default is
 	for returning a `LAR` value, i.e. a pair `(Points, Cells)`.
 	The *dimension* of `Cells` is the one of the number `M` of rows of 
-	cell `Points`. The dimensions of `Array{Cells,1}` in `LAR_Model` run 
+	cell `Points`. The dimensions of `Array{Cells,1}` in `LARmodel` run 
 	from ``1`` to ``M``.
 	"""
 	cuboidGrid = LARLIB.larCuboids
@@ -249,12 +258,12 @@ module LARVIEW
 
 
 	"""
-		view(model::LAR_Model)
+		view(model::LARmodel)
 		
 	Base.view extension. 
 	Display a *Python*  `HPC` (Hierarchica Polyhedral Complex) `object` using 
 	the *`PyPlasm` viewer*, written in C++ with `OpenGL` and acceleration algorithms 
-	for *big geometric data* structures. The input is a `LAR_Model` object.
+	for *big geometric data* structures. The input is a `LARmodel` object.
 	
 	# Example
 	
@@ -265,8 +274,8 @@ module LARVIEW
 	julia> view(cuboid([1,1,1],full=true))
 	```
 	"""
-	function view(model::LAR_Model)
-		hpc = hpc_exploded(model::LAR_Model)(1,1,1)
+	function view(model::LARmodel)
+		hpc = hpc_exploded(model::LARmodel)(1,1,1)
 		p.VIEW(hpc)
 	end
 
@@ -296,11 +305,17 @@ module LARVIEW
 	end
 
 
+	function view(scene::Array{Any,1})
+		if prod([isa(item[1:2],LAR) for item in scene])
+			p.VIEW(p.STRUCT([lar2hpc(collect(item)) for item in scene]))
+		end
+	end
+
 
 	"""
-		hpc_exploded( model::LAR_Model )( sx=1.2, sy=1.2, sz=1.2 )::Hpc
+		hpc_exploded( model::LARmodel )( sx=1.2, sy=1.2, sz=1.2 )::Hpc
 		
-	Convert a `LAR_Model` into a `Hpc` object, after exploding all-dimensional cells with 
+	Convert a `LARmodel` into a `Hpc` object, after exploding all-dimensional cells with 
 	scale `sx,sy,sz` parameters. Every cell is *translated* by the vector difference 
 	between its *scaled centroid* and its *centroid*. Every cell is transformed in a 
 	single `LAR` object before explosion.
@@ -312,7 +327,7 @@ module LARVIEW
 	julia> view(hpc)
 	```
 	"""
-	function hpc_exploded( model::LAR_Model )::Hpc
+	function hpc_exploded( model::LARmodel )::Hpc
 		function hpc_exploded0( sx=1.2, sy=1.2, sz=1.2 )
 			verts,cells = model
 			out = Any[]
@@ -359,9 +374,9 @@ module LARVIEW
 
 
 	"""
-		lar2hpc(model::LAR_Model)::Hpc
+		lar2hpc(model::LARmodel)::Hpc
 		
-	Return an `Hpc` object starting from a `LAR_Model` object. *HPC = 
+	Return an `Hpc` object starting from a `LARmodel` object. *HPC = 
 	Hierarchical Polyhedral Complex* is the geometric data structure 
 	used by `PLaSM` (Programming LAnguage for Solid Modeling). See the Wiley's book 
 	[*Geometric Programming for Computer-Aided Design*]
@@ -380,12 +395,17 @@ module LARVIEW
 	julia> view(hpc_exploded(model)(1.5,1.5,1.5))
 	```
 	"""
-	function lar2hpc(model::LAR_Model)::Hpc
+	function lar2hpc(model::LARmodel)::Hpc
 		verts = model[1]
 		cells = Array{Int,1}[]
 		for item in model[2]
 			append!(cells, item)
 		end
+		hpc = mkpol(verts,cells)
+	end
+	function lar2hpc(model::Array{Array,1})::Hpc
+		verts = model[1]
+		cells = model[2]
 		hpc = mkpol(verts,cells)
 	end
 
@@ -409,7 +429,7 @@ module LARVIEW
 	"""
 	function lar2exploded_hpc(V::Points,CV::Cells)
 		model = (V,[CV])
-		hpc = hpc_exploded( model::LAR_Model )()
+		hpc = hpc_exploded( model::LARmodel )()
 	end
 
 
