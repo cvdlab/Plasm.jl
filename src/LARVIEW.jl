@@ -305,6 +305,33 @@ module LARVIEW
 	end
 
 
+	"""
+		view(obj::LARLIB.Struct)
+	
+	Display a geometric value of `Struct` type, via conversion to `LAR`
+	and then to `Hpc` values. 
+	"""
+	function view(obj::LARLIB.Struct)
+		lar = LARLIB.struct2lar(obj)
+		view(lar)
+	end
+
+
+
+	"""
+		view(scene::Array{Any,1})
+
+	Display a geometric `scene`, defined as `Array{Any,1}` of geometric objects
+	defined in the *same* coordinate system, i.e. in *World Coordinates*.
+	
+	# Example 
+	
+	A hierarchical `scene` defined in *Local Coordinates* as value of `Struct` type, 
+	must be converted to `Array{Any,1}` by the expression 
+	
+		`evalStruct(scene::Struct)::Array{Any,1}`
+	
+	"""
 	function view(scene::Array{Any,1})
 		if prod([isa(item[1:2],LAR) for item in scene])
 			p.VIEW(p.STRUCT([lar2hpc(collect(item)) for item in scene]))
