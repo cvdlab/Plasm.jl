@@ -306,13 +306,13 @@ module LARVIEW
 
 
 	"""
-		view(obj::LARLIB.Struct)
+		view(obj::Struct)
 	
 	Display a geometric value of `Struct` type, via conversion to `LAR`
 	and then to `Hpc` values. 
 	"""
-	function view(obj::LARLIB.Struct)
-		lar = LARLIB.struct2lar(obj)
+	function view(obj::Struct)
+		lar = struct2lar(obj)
 		view(lar)
 	end
 
