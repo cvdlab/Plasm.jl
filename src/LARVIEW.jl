@@ -1,10 +1,13 @@
 module LARVIEW
 
-	export centroid, cuboidGrid, mkpol, view, hpc_exploded, lar2hpc
+	#export centroid, cuboidGrid, mkpol, view, hpc_exploded, lar2hpc
 
 	using LARLIB
+	
 	using PyCall
+	
 	@pyimport pyplasm as p
+	
 	import Base.view
 
 	"""
@@ -126,7 +129,9 @@ module LARVIEW
 	``M`` coordinates of *barycenter* of the dense array of ``N`` `points` is the *mean*
 	of the corresponding `Points` coordinates.
 	"""
-	centroid(V::Points) = sum(V,2)/size(V,2)
+	function centroid(V::Points) 
+		return sum(V,2)/size(V,2)::Array{Float64,1}
+	end
 	
 
 	"""
@@ -136,8 +141,9 @@ module LARVIEW
 	``M`` coordinates of *barycenter* of the dense array of ``N`` `points` is the *mean*
 	of the corresponding `Array` coordinates.
 	"""
-	centroid(V::Array{Int64,2}) = sum(V,2)/size(V,2)::Array{Float64,1}
-
+	function centroid(V::Array{Int64,2}) 
+		return sum(V,2)/size(V,2)::Array{Float64,1}
+	end
 
 	"""
 		cells2py(cells::Cells)::PyObject
@@ -147,7 +153,7 @@ module LARVIEW
 	
 	# Example
 	``` julia
-	julia> FV = cuboid([1,1,1],full=true)[2][3]
+	julia> FV = LARLIB.cuboid([1,1,1],full=true)[2][3]
 	6-element Array{Array{Int64,1},1}:
 	 [1, 2, 3, 4]
 	 [5, 6, 7, 8]
@@ -175,13 +181,13 @@ module LARVIEW
 	
 	# Example
 	``` julia
-	julia> V = cuboid([1,1,1])[1]
+	julia> V = LARLIB.cuboid([1,1,1])[1]
 	3×8 Array{Float64,2}:
 	 0.0  0.0  0.0  0.0  1.0  1.0  1.0  1.0
 	 0.0  0.0  1.0  1.0  0.0  0.0  1.0  1.0
 	 0.0  1.0  0.0  1.0  0.0  1.0  0.0  1.0
 
-	julia> points2py(V::Points)
+	julia> LARVIEW.points2py(V::Points)
 	PyObject [[0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [0.0, 1.0, 0.0], [0.0, 1.0, 1.0], 
 	[1.0, 0.0, 0.0], [1.0, 0.0, 1.0], [1.0, 1.0, 0.0], [1.0, 1.0, 1.0]]
 	```
@@ -222,17 +228,17 @@ module LARVIEW
 	
 	# Example
 	``` julia
-	julia> m = cuboidGrid([2,2],true)
+	julia> m = LARLIB.cuboidGrid([2,2],true)
 	([0.0 0.0 … 2.0 2.0; 0.0 1.0 … 1.0 2.0], Array{Array{Int64,1},1}[Array{Int64,1}[[1], 
 	[2], [3], [4], [5], [6], [7], [8], [9]], Array{Int64,1}[[1, 2], [2, 3], [4, 5], [5, 
 	6], [7, 8], [8, 9], [1, 4], [2, 5], [3, 6], [4, 7], [5, 8], [6, 9]], 
 	Array{Int64,1}[[1, 2, 4, 5], [2, 3, 5, 6], [4, 5, 7, 8], [5, 6, 8, 9]]])
 
-	julia> hpc = mkpol(m[1],m[2][2])
+	julia> hpc = LARVIEW.mkpol(m[1],m[2][2])
 	PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 'std::shared_ptr< Hpc > *' 
 	at 0x140d6c780> >
 
-	julia> view(hpc)
+	julia> LARVIEW.view(hpc)
 	``` 
 	"""
 	function view(hpc::Hpc)
@@ -268,10 +274,10 @@ module LARVIEW
 	# Example
 	
 	```julia
-	julia> typeof(cuboid([1,1,1],full=true))
+	julia> typeof(LARLIB.cuboid([1,1,1],full=true))
 	Tuple{Array{Float64,2},Array{Array{Int64,1},1}}
 	
-	julia> view(cuboid([1,1,1],full=true))
+	julia> LARVIEW.view(LARLIB.cuboid([1,1,1],full=true))
 	```
 	"""
 	function view(model::LARmodel)
@@ -292,10 +298,10 @@ module LARVIEW
 	
 	# Example
 	```julia
-	julia> typeof(cuboid([1,1,1])::LAR)
+	julia> typeof(LARLIB.cuboid([1,1,1])::LAR)
 	Tuple{Array{Float64,2},Array{Array{Int64,1},1}}
 		
-	julia> view(cuboid([1,1,1]))
+	julia> LARVIEW.view(LARLIB.cuboid([1,1,1]))
 	```
 	"""
 	function view(pair::Tuple{Points,Cells})
@@ -306,13 +312,13 @@ module LARVIEW
 
 
 	"""
-		view(obj::Struct)
+		view(obj::LARLIB.Struct)
 	
 	Display a geometric value of `Struct` type, via conversion to `LAR`
 	and then to `Hpc` values. 
 	"""
-	function view(obj::Struct)
-		lar = struct2lar(obj)
+	function view(obj::LARLIB.Struct)
+		lar = LARLIB.struct2lar(obj)
 		view(lar)
 	end
 
@@ -349,9 +355,9 @@ module LARVIEW
 	
 	# Example
 	```julia
-	julia> hpc = hpc_exploded(cuboid([1,1,1],full=true))(1.5,1.5,1.5)
+	julia> hpc = LARVIEW.hpc_exploded(LARLIB.cuboid([1,1,1],full=true))(1.5,1.5,1.5)
 	
-	julia> view(hpc)
+	julia> LARVIEW.view(hpc)
 	```
 	"""
 	function hpc_exploded( model::LARmodel )::Hpc
@@ -412,14 +418,14 @@ module LARVIEW
 	(https://github.com/plasm-language/pyplasm).
 	# Example
 	```julia
-	julia> model = cuboid([1,1,1],full=true)
+	julia> model = LARLIB.cuboid([1,1,1],full=true)
 	([0.0 1.0 … 0.0 1.0; 0.0 0.0 … 1.0 1.0; 0.0 0.0 … 1.0 1.0], 
 	Array{Int64,1}[[1, 2, 3, 5], [2, 3, 5, 6], [3, 5, 6, 7], [2, 3, 4, 6], 
 	[3, 4, 6, 7], [4, 6, 7, 8]])
 	
-	julia> view(lar2hpc(model))
+	julia> LARVIEW.view(LARVIEW.lar2hpc(model))
 	
-	julia> view(hpc_exploded(model)(1.5,1.5,1.5))
+	julia> LARVIEW.view(LARVIEW.hpc_exploded(model)(1.5,1.5,1.5))
 	```
 	"""
 	function lar2hpc(model::LARmodel)::Hpc
