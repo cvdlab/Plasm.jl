@@ -123,28 +123,29 @@ module LARVIEW
 
 
 	"""
-		centroid(V::Points)::Array{Float64,1}
+		centroid( V::Points )::Array{Float64,1}
 		
 	*Geometric center* of a `Points` 2-array of `size` ``(M,N)``. Each of the 
 	``M`` coordinates of *barycenter* of the dense array of ``N`` `points` is the *mean*
 	of the corresponding `Points` coordinates.
 	"""
-	function centroid(V::Points) 
-		return sum(V,2)/size(V,2)::Array{Float64,1}
+	function centroid( V::Points )::Array{Float64,2}
+		return sum(V,2)/size(V,2)
 	end
 	
 
 	"""
-		centroid(V::Array{Int64,2})::Array{Float64,1}
+		centroid(V::Array{Float64,2})::Array{Float64,1}
 		
 	*Geometric center* of a `Points` 2-array of `size` ``(M,N)``. Each of the 
 	``M`` coordinates of *barycenter* of the dense array of ``N`` `points` is the *mean*
 	of the corresponding `Array` coordinates.
 	"""
-	function centroid(V::Array{Int64,2}) 
-		return sum(V,2)/size(V,2)::Array{Float64,1}
-	end
-
+	function centroid(V::Array{Float64,2})::Array{Float64,2}
+	    return sum(V,2)/size(V,2)
+    end
+    
+    
 	"""
 		cells2py(cells::Cells)::PyObject
 		
@@ -153,7 +154,7 @@ module LARVIEW
 	
 	# Example
 	``` julia
-	julia> FV = LARLIB.cuboid([1,1,1],full=true)[2][3]
+	julia> FV = LARLIB.cuboid([1,1,1],true)[2][3]
 	6-element Array{Array{Int64,1},1}:
 	 [1, 2, 3, 4]
 	 [5, 6, 7, 8]
@@ -162,7 +163,7 @@ module LARVIEW
 	 [1, 3, 5, 7]
 	 [2, 4, 6, 8]
 
-	julia> LARVIEW.cells2py(FV)
+	julia> cells2py(FV)
 	PyObject [[1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 5, 6], [3, 4, 7, 8], 
 	[1, 3, 5, 7], [2, 4, 6, 8]]
 	```
@@ -187,7 +188,7 @@ module LARVIEW
 	 0.0  0.0  1.0  1.0  0.0  0.0  1.0  1.0
 	 0.0  1.0  0.0  1.0  0.0  1.0  0.0  1.0
 
-	julia> LARVIEW.points2py(V::Points)
+	julia> points2py(V::Points)
 	PyObject [[0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [0.0, 1.0, 0.0], [0.0, 1.0, 1.0], 
 	[1.0, 0.0, 0.0], [1.0, 0.0, 1.0], [1.0, 1.0, 0.0], [1.0, 1.0, 1.0]]
 	```
@@ -208,6 +209,18 @@ module LARVIEW
 	(https://onlinelibrary.wiley.com/doi/book/10.1002/0470013885) and its 
 	current `Python` library [*https://github.com/plasm-language/pyplasm*]
 	(https://github.com/plasm-language/pyplasm).
+	
+	```julia
+	julia> V,(VV,EV,FV,CV) = LARLIB.cuboid([1,1,1],true);
+	
+	julia> mkpol(V,EV)
+	PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 
+	'std::shared_ptr< Hpc > *' at 0x12cf45d50> >
+
+	julia> 
+	view(mkpol(V,EV))	
+	[...]
+	```
 	"""
 	function mkpol(verts::Points, cells::Cells)::Hpc
 		verts = points2py(verts)
@@ -234,11 +247,11 @@ module LARVIEW
 	6], [7, 8], [8, 9], [1, 4], [2, 5], [3, 6], [4, 7], [5, 8], [6, 9]], 
 	Array{Int64,1}[[1, 2, 4, 5], [2, 3, 5, 6], [4, 5, 7, 8], [5, 6, 8, 9]]])
 
-	julia> hpc = LARVIEW.mkpol(m[1],m[2][2])
+	julia> hpc = mkpol(m[1],m[2][2])
 	PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 'std::shared_ptr< Hpc > *' 
 	at 0x140d6c780> >
 
-	julia> LARVIEW.view(hpc)
+	julia> view(hpc)
 	``` 
 	"""
 	function view(hpc::Hpc)
@@ -255,6 +268,20 @@ module LARVIEW
 	the *`PyPlasm` viewer*, written in C++ with `OpenGL` and acceleration algorithms 
 	for *big geometric data* structures. Input parameters are of `Points` and `Cells`
 	type.
+	
+	# Example
+
+	```julia
+	julia> V,(VV,EV,FV,CV) = LARLIB.cuboid([1,1,1],true);
+	
+	julia> mkpol(V,EV)
+	PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 
+	'std::shared_ptr< Hpc > *' at 0x12cf45d50> >
+
+	julia> 
+	view(mkpol(V,EV))	
+	[...]
+	```
 	"""
 	function view(V::Points, CV::Cells)
 		hpc = lar2hpc(V::Points, CV::Cells)
@@ -274,10 +301,10 @@ module LARVIEW
 	# Example
 	
 	```julia
-	julia> typeof(LARLIB.cuboid([1,1,1],full=true))
+	julia> typeof( LARLIB.cuboid([1,1,1], true) )
 	Tuple{Array{Float64,2},Array{Array{Int64,1},1}}
 	
-	julia> LARVIEW.view(LARLIB.cuboid([1,1,1],full=true))
+	julia> view( LARLIB.cuboid([1,1,1], true) )
 	```
 	"""
 	function view(model::LARmodel)
@@ -355,16 +382,16 @@ module LARVIEW
 	
 	# Example
 	```julia
-	julia> hpc = LARVIEW.hpc_exploded(LARLIB.cuboid([1,1,1],full=true))(1.5,1.5,1.5)
+	julia> hpc = hpc_exploded(LARLIB.cuboid([1,1,1], true))(1.5,1.5,1.5)
 	
-	julia> LARVIEW.view(hpc)
+	julia> view(hpc)
 	```
 	"""
-	function hpc_exploded( model::LARmodel )::Hpc
-		function hpc_exploded0( sx=1.2, sy=1.2, sz=1.2 )
+	function hpc_exploded( model::LARmodel )
+		function hpc_exploded0( sx=1.2, sy=1.2, sz=1.2 )::Hpc
 			verts,cells = model
-			out = Any[]
-			for skeleton in cells
+			out = []
+			for skeleton in cells[2:end]
 				for cell in skeleton
 					vcell = hcat([[verts[h,k] for h=1:size(verts,1)] for k in cell]...)
 				
@@ -375,12 +402,13 @@ module LARVIEW
 					vcell = vcell .+ translation_vector
 		
 					py_verts = points2py(vcell)
-					py_cells = collect(range(1,length(py_verts)))
-					hpc = p.MKPOL([py_verts,[py_cells],[]])
+					py_cells = cells2py( [collect(1:size(vcell,2))] )
+					
+					hpc = p.MKPOL([ py_verts, py_cells, [] ])
 					push!(out, hpc)
 				end
 			end
-			hpc = p.STRUCT(PyObject(out))
+			hpc = p.STRUCT(out)
 			return hpc
 		end
 		return hpc_exploded0
@@ -398,6 +426,19 @@ module LARVIEW
 	(https://onlinelibrary.wiley.com/doi/book/10.1002/0470013885) and its 
 	current `Python` library [*https://github.com/plasm-language/pyplasm*]
 	(https://github.com/plasm-language/pyplasm).
+	# Example
+
+	```julia
+	julia> V,(VV,EV,FV,CV) = LARLIB.cuboid([1,1,1],true);
+	
+	julia> hpc = lar2hpc( (V, CV)::LAR ... )::Hpc
+	PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 
+	'std::shared_ptr< Hpc > *' at 0x12cf45d50> >
+
+	julia> 
+	view(hpc)	
+	[...]
+	```
 	"""
 	function lar2hpc(V::Points, CV::Cells)::Hpc
 		hpc = mkpol(V,CV)
@@ -418,14 +459,11 @@ module LARVIEW
 	(https://github.com/plasm-language/pyplasm).
 	# Example
 	```julia
-	julia> model = LARLIB.cuboid([1,1,1],full=true)
-	([0.0 1.0 … 0.0 1.0; 0.0 0.0 … 1.0 1.0; 0.0 0.0 … 1.0 1.0], 
-	Array{Int64,1}[[1, 2, 3, 5], [2, 3, 5, 6], [3, 5, 6, 7], [2, 3, 4, 6], 
-	[3, 4, 6, 7], [4, 6, 7, 8]])
+	julia> model = LARLIB.cuboid([1,1,1],true);
 	
-	julia> LARVIEW.view(LARVIEW.lar2hpc(model))
+	julia> view( lar2hpc(model) )
 	
-	julia> LARVIEW.view(LARVIEW.hpc_exploded(model)(1.5,1.5,1.5))
+	julia> view( hpc_exploded(model)(1.5,1.5,1.5) )
 	```
 	"""
 	function lar2hpc(model::LARmodel)::Hpc
@@ -436,18 +474,13 @@ module LARVIEW
 		end
 		hpc = mkpol(verts,cells)
 	end
-	function lar2hpc(model::Array{Array,1})::Hpc
-		verts = model[1]
-		cells = model[2]
-		hpc = mkpol(verts,cells)
-	end
 
 
 
 	"""
 		lar2exploded_hpc(V::Points,CV::Cells)::Hpc
 
-	Return an *exploded* `Hpc` object starting from a `Points` and a `Cells` 
+	Return an *exploded* `Hpc` object starting from a `V::Points` and a `CV::Cells` 
 	object, after exploding cells in `CV` with 
 	scale `sx,sy,sz` parameters. Every cell is *translated* by the vector difference 
 	between its *scaled centroid* and its *centroid*. Every cell is transformed in a 
@@ -458,22 +491,22 @@ module LARVIEW
 	(https://onlinelibrary.wiley.com/doi/book/10.1002/0470013885) and its 
 	current `Python` library [*https://github.com/plasm-language/pyplasm*]
 	(https://github.com/plasm-language/pyplasm).
+	
+	BUG (Julia?, PyCall?):  
+	hpc_exploded( (V,cells) )(sx,sy,sz)  ==>  OK
+	hpc_exploded( (V,[cells[4]]) )(sx,sy,sz)  ==> KO
+	with typeof(cells) == typeof([cells[4]]) == true
+	
+	V,cells = LARLIB.cuboidGrid([3,3,1],true)
+	lar2exploded_hpc(V::Points,cells[4]::Cells)()
 
 	"""
-	function lar2exploded_hpc(V::Points,CV::Cells)
-		model = (V,[CV])
-		hpc = hpc_exploded( model::LARmodel )()
+	function lar2exploded_hpc(V::Points,cells::Array{Cells,1})
+		function lar2exploded_hpc0(sx=1.2, sy=1.2, sz=1.2)
+			hpc = hpc_exploded( (V,cells) )(sx,sy,sz)
+		end
+		return lar2exploded_hpc0
 	end
 
 
-	
-	"""
-		view_exploded(V::Points,CV::Cells)
-		
-	Display a *Python*  `HPC` (Hierarchica Polyhedral Complex) `object` using 
-	the *`PyPlasm` viewer*, written in C++ with `OpenGL` and acceleration algorithms 
-	for *big geometric data* structures. 
-	"""
-	view_exploded(V,CV) = view(lar2exploded_hpc(V,CV))
-
-end
+end # module
