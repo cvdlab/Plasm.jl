@@ -366,7 +366,7 @@ module LARVIEW
 	
 	"""
 	function view(scene::Array{Any,1})
-		if prod([isa(item[1:2],LAR) for item in scene])
+		if prod([isa(item[1:2],LARLIB.LAR) for item in scene])
 			p.VIEW(p.STRUCT([lar2hpc(collect(item)) for item in scene]))
 		end
 	end
@@ -473,6 +473,10 @@ module LARVIEW
 			append!(cells, item)
 		end
 		hpc = mkpol(verts,cells)
+	end
+
+	function lar2hpc(scene::Array{Any,1})::Hpc
+		hpc = p.STRUCT([ LARVIEW.mkpol(item[1],item[2]) for item in scene ])
 	end
 
 
