@@ -163,7 +163,7 @@ module LARVIEW
 	 [1, 3, 5, 7]
 	 [2, 4, 6, 8]
 
-	julia> cells2py(FV)
+	julia> LARVIEW.cells2py(FV)
 	PyObject [[1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 5, 6], [3, 4, 7, 8], 
 	[1, 3, 5, 7], [2, 4, 6, 8]]
 	```
@@ -188,7 +188,7 @@ module LARVIEW
 	 0.0  0.0  1.0  1.0  0.0  0.0  1.0  1.0
 	 0.0  1.0  0.0  1.0  0.0  1.0  0.0  1.0
 
-	julia> points2py(V::Points)
+	julia> LARVIEW.points2py(V)
 	PyObject [[0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [0.0, 1.0, 0.0], [0.0, 1.0, 1.0], 
 	[1.0, 0.0, 0.0], [1.0, 0.0, 1.0], [1.0, 1.0, 0.0], [1.0, 1.0, 1.0]]
 	```
@@ -213,12 +213,11 @@ module LARVIEW
 	```julia
 	julia> V,(VV,EV,FV,CV) = LARLIB.cuboid([1,1,1],true);
 	
-	julia> mkpol(V,EV)
+	julia> LARVIEW.mkpol(V,EV)
 	PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 
 	'std::shared_ptr< Hpc > *' at 0x12cf45d50> >
 
-	julia> 
-	view(mkpol(V,EV))	
+	julia> LARVIEW.view(LARVIEW.mkpol(V,EV))	
 	[...]
 	```
 	"""
@@ -247,11 +246,11 @@ module LARVIEW
 	6], [7, 8], [8, 9], [1, 4], [2, 5], [3, 6], [4, 7], [5, 8], [6, 9]], 
 	Array{Int64,1}[[1, 2, 4, 5], [2, 3, 5, 6], [4, 5, 7, 8], [5, 6, 8, 9]]])
 
-	julia> hpc = mkpol(m[1],m[2][2])
+	julia> hpc = LARVIEW.mkpol(m[1],m[2][2])
 	PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 'std::shared_ptr< Hpc > *' 
 	at 0x140d6c780> >
 
-	julia> view(hpc)
+	julia> LARVIEW.view(hpc)
 	``` 
 	"""
 	function view(hpc::Hpc)
@@ -274,12 +273,12 @@ module LARVIEW
 	```julia
 	julia> V,(VV,EV,FV,CV) = LARLIB.cuboid([1,1,1],true);
 	
-	julia> mkpol(V,EV)
+	julia> LARVIEW.mkpol(V,EV)
 	PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 
 	'std::shared_ptr< Hpc > *' at 0x12cf45d50> >
 
 	julia> 
-	view(mkpol(V,EV))	
+	LARVIEW.view(LARVIEW.mkpol(V,EV))	
 	[...]
 	```
 	"""
@@ -304,7 +303,7 @@ module LARVIEW
 	julia> typeof( LARLIB.cuboid([1,1,1], true) )
 	Tuple{Array{Float64,2},Array{Array{Int64,1},1}}
 	
-	julia> view( LARLIB.cuboid([1,1,1], true) )
+	julia> LARVIEW.view( LARLIB.cuboid([1,1,1], true) )
 	```
 	"""
 	function view(model::LARmodel)
@@ -343,6 +342,17 @@ module LARVIEW
 	
 	Display a geometric value of `Struct` type, via conversion to `LAR`
 	and then to `Hpc` values. 
+	
+	# Example
+	```julia
+	cube = LARLIB.apply( LARLIB.t(-.5,-.5,0), LARLIB.cuboid([1,1,1]));
+	tableTop = LARLIB.Struct([ LARLIB.t(0,0,.85), LARLIB.s(1,1,.05), cube ]);
+	tableLeg = LARLIB.Struct([ LARLIB.t(-.475,-.475,0), LARLIB.s(.1,.1,.89), cube ]);
+	tablelegs = LARLIB.Struct( repeat([ tableLeg, LARLIB.r(0,0,pi/2) ],outer=4) );
+	table = LARLIB.Struct([ tableTop, tablelegs ]);
+	
+	LARVIEW.view(table)
+	```
 	"""
 	function view(obj::LARLIB.Struct)
 		lar = LARLIB.struct2lar(obj)
@@ -364,10 +374,12 @@ module LARVIEW
 	
 		`evalStruct(scene::Struct)::Array{Any,1}`
 	
+	
+	
 	"""
 	function view(scene::Array{Any,1})
 		if prod([isa(item[1:2],LARLIB.LAR) for item in scene])
-			p.VIEW(p.STRUCT([lar2hpc(collect(item)) for item in scene]))
+			p.VIEW(p.STRUCT([LARVIEW.lar2hpc(item) for item in scene]))
 		end
 	end
 
@@ -457,13 +469,14 @@ module LARVIEW
 	(https://onlinelibrary.wiley.com/doi/book/10.1002/0470013885) and its 
 	current `Python` library [*https://github.com/plasm-language/pyplasm*]
 	(https://github.com/plasm-language/pyplasm).
+	
 	# Example
 	```julia
 	julia> model = LARLIB.cuboid([1,1,1],true);
 	
-	julia> view( lar2hpc(model) )
+	julia> view( LARVIEW.lar2hpc(model) )
 	
-	julia> view( hpc_exploded(model)(1.5,1.5,1.5) )
+	julia> view( LARVIEW.hpc_exploded(model)(1.5,1.5,1.5) )
 	```
 	"""
 	function lar2hpc(model::LARmodel)::Hpc
@@ -475,8 +488,31 @@ module LARVIEW
 		hpc = mkpol(verts,cells)
 	end
 
+
+
+	"""
+		lar2hpc(scene::Array{Any,1})::Hpc
+
+	# Example
+	```julia
+	square = ([[0; 0] [0; 1] [1; 0] [1; 1]], [[1, 2, 3, 4]], 
+	[[1,2], [1,3], [2,4], [3,4]])
+	V,FV,EV  =  square
+	model  =  V,([[1],[2],[3],[4]],EV,FV)
+	table = LARLIB.apply(LARLIB.t(-0.5,-0.5), square)
+	chair = LARLIB.Struct([LARLIB.t(0.75,0),LARLIB.s(0.35,0.35),table])
+	structo = LARLIB.Struct([LARLIB.t(2,1),table,repeat([LARLIB.r(pi/2),chair],
+			outer = 4)...])
+	structo1 = LARLIB.Struct(repeat([structo,LARLIB.t(0,2.5)],outer = 10));
+	structo2 = LARLIB.Struct(repeat([structo1,LARLIB.t(3,0)],outer = 10));
+	scene = LARLIB.evalStruct(structo2);
+	
+	LARVIEW.view(LARVIEW.lar2hpc(scene))
+	```
+
+	"""
 	function lar2hpc(scene::Array{Any,1})::Hpc
-		hpc = p.STRUCT([ LARVIEW.mkpol(item[1],item[2]) for item in scene ])
+		hpc = p.STRUCT([ mkpol(item[1],item[2]) for item in scene ])
 	end
 
 
@@ -502,7 +538,7 @@ module LARVIEW
 	with typeof(cells) == typeof([cells[4]]) == true
 	
 	V,cells = LARLIB.cuboidGrid([3,3,1],true)
-	lar2exploded_hpc(V::Points,cells[4]::Cells)()
+	LARVIEW.lar2exploded_hpc(V::Points,cells[4]::Cells)()
 
 	"""
 	function lar2exploded_hpc(V::Points,cells::Array{Cells,1})
