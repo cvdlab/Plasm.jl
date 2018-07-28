@@ -511,7 +511,9 @@ module LARVIEW
 	```
 
 	"""
-	function lar2hpc(scene::Array{Any,1})::Hpc
+	function lar2hpc(scene::Union{Array{Any,1},Tuple{Array{Float64,2},
+	Array{Array{Int64,1},1}, 
+	Array{Array{Int64,1},1}}})::Hpc
 		hpc = p.STRUCT([ mkpol(item[1],item[2]) for item in scene ])
 	end
 
