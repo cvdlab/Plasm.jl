@@ -394,7 +394,7 @@ module LARVIEW
 	
 	# Example
 	```julia
-	julia> hpc = hpc_exploded(LARLIB.cuboid([1,1,1], true))(1.5,1.5,1.5)
+	julia> hpc = LARVIEW.hpc_exploded(LARLIB.cuboidGrid([1,2,3], true))(1.5,1.5,1.5)
 	
 	julia> view(hpc)
 	```
