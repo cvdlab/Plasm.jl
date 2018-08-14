@@ -379,7 +379,7 @@ module LARVIEW
 	"""
 	function view(scene::Array{Any,1})
 		if prod([isa(item[1:2],LARLIB.LAR) for item in scene])
-			p.VIEW(p.STRUCT([LARVIEW.lar2hpc(item) for item in scene]))
+			p.VIEW(p.STRUCT([LARVIEW.lar2hpc(item[1],item[2]) for item in scene]))
 		end
 	end
 
@@ -511,9 +511,7 @@ module LARVIEW
 	```
 
 	"""
-	function lar2hpc(scene::Union{Array{Any,1},Tuple{Array{Float64,2},
-	Array{Array{Int64,1},1}, 
-	Array{Array{Int64,1},1}}})::Hpc
+	function lar2hpc(scene::Array{Any,1})::Hpc
 		hpc = p.STRUCT([ mkpol(item[1],item[2]) for item in scene ])
 	end
 
