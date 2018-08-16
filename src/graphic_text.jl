@@ -281,7 +281,7 @@ hpcs = [
 	ascii122,ascii123,ascii124,ascii125,ascii126 ]
 
 
-""" 
+"""
 	ascii_LAR::DataStructures.OrderedDict
 
 *Ordered dictionary* of printable ASCII codes as one-dimensional *LAR models* in 2D.
@@ -465,75 +465,69 @@ function textWithAttributes(textalignment="centre", textangle=0,
 end
  
 
+""" 
+	embed(n::Int)(model::LAR)::LAR
+
+Embed a `LAR` `model` of dimension ``d`` in a space ``R^{d+n}``.
+The embedding is done by adding ``d`` zero coordinates to each vertex.
+
+# Example
+
+```
+julia> square = LARLIB.cuboid([1,1])
+([0.0 0.0 1.0 1.0; 0.0 1.0 0.0 1.0], Array{Int64,1}[[1, 2, 3, 4]])
+
+julia> embed(1)(square)
+([0.0 0.0 1.0 1.0; 0.0 1.0 0.0 1.0; 0.0 0.0 0.0 0.0], Array{Int64,1}[[1, 2, 3, 4]])
+```
+"""
+function embed(n)
+	function embed0( larmodel )
+		return [larmodel[1]; zeros(n,size(larmodel[1],2))], larmodel[2]
+	end
+	return embed0
+end
+
+
+"""
+	numbering(model::LARmodel)
+
+Display a *wireframe* of `model` cells, of any dimension, with their *ordinal number*.
+Different `colors` and size are used for the various dimensional cells.
+
+# Examples
+
+```
+model = LARLIB.cuboidGrid([3,4,2], true)
+LARVIEW.view(numbering(model)) 
+
+model = LARLIB.cuboidGrid([10,10], true)
+LARVIEW.view(numbering(model))
+```
+""" 
+function numbering(model) 
+	V,cells = model
+	if size(V,1)==2 
+		V = embed(1)(model)[1]
+	end
+	wireframe = LARVIEW.lar2hpc(V,cells[2])
+	scene = [wireframe]
+	for (h,skel) in enumerate(cells)
+		colors = [p.GREEN,p.YELLOW,p.CYAN,p.ORANGE]
+		nums = []
+		for (k,cell) in enumerate(skel)
+			center = sum([V[:,v] for v in cell])/length(cell)
+			code = embed(1)( gcode(string(k)) )
+			scaling = (0.6+0.1h,0.6+0.1h,1)
+			push!(nums, LARLIB.struct2lar( LARLIB.Struct([ 
+				LARLIB.t(center...), LARLIB.s(scaling...), code ]) ))
+		end
+		hpc = LARVIEW.lar2hpc(nums)
+		push!( scene, p.COLOR(colors[h])(hpc) )
+	end
+	p.STRUCT( scene )
+end
 
 
 
 
-#function array2list(cells) 
-#return PyObject([Any[cell[h] for h=1:length(cell)] for cell in cells])
-#end
-#
-#function doublefirst(cells)
-#return p.AL([cells[1],cells])
-#end
-#
-## LAR `model` ->  numbered `HPC` obyect
-#function lar2numbered_hpc(larmodel,scaling=1.0)
-#	V,cells = larmodel
-#	VV,EV,FV,CV = cells
-#
-#	Z = hcat(V[:,1],V)
-#	W = PyCall.PyObject([Any[Z[h,k] for h=1:size(Z,1)] for k=1:size(Z,2)])
-#
-#	VV,EV,FV,CV = map(doublefirst,[VV+1,EV+1,FV+1,CV+1])
-#	WW,EW,FW,CW = map(array2list,[VV,EV,FV,CV])
-#	PyCall.PyObject([WW,EW,FW,CW])
-#	wire = p.MKPOL(PyCall.PyObject([W,EW,[]]))
-#
-#	VV,EV,FV,CV = VV-1,EV-1,FV-1,CV-1
-#	WW,EW,FW,CW = map(array2list,[VV,EV,FV,CV])
-#	hpc = p.larModelNumbering(1,1,1)(W,PyCall.PyObject([WW,EW,FW,CW]),wire,scaling)
-#end
-#
-#
-## Display a numbered `HPC` object from a `LAR` model with the `PyPlasm` viewer
-#viewnumbered(larmodel,scaling=1.0) = p.VIEW(lar2numbered_hpc(larmodel,scaling))
-#
-#def cellNumbering (larModel,hpcModel):
-#V,CV = larModel
-#def cellNumbering0 (cellSubset,color=WHITE,scalingFactor=1):
-#	text = TEXTWITHATTRIBUTES (TEXTALIGNMENT='centre',TEXTANGLE=0,
-#						TEXTWIDTH=0.1*scalingFactor,
-#						TEXTHEIGHT=0.2*scalingFactor,
-#						TEXTSPACING=0.025*scalingFactor)
-#	hpcList = [hpcModel]
-#	for cell in cellSubset:
-#		point = CCOMB([V[v] for v in CV[cell]])
-#		hpcList.append(T([1,2,3])(point)(COLOR(color)(text(str(cell)))))
-#	return STRUCT(hpcList)
-#return cellNumbering0
-#
-#def modelIndexing(shape):
-#   V,bases = larCuboids(shape,True)
-#   # bases = [[cell for cell in cellComplex if len(cell)==2**k] for k in range(4)]
-#   color = [ORANGE,CYAN,GREEN,WHITE]
-#   nums = AA(range)(AA(len)(bases))
-#   hpcs = []
-#   for k in range(4):
-#       hpcs += [SKEL_1(STRUCT(MKPOLS((V,bases[k]))))]
-#       hpcs += [cellNumbering((V,bases[k]),hpcs[2*k])(nums[k],color[k],0.3+0.2*k)]
-#   return STRUCT(hpcs)
-#
-#def larModelNumbering(scalx=1,scaly=1,scalz=1):
-#   def  larModelNumbering0(V,bases,submodel,numberScaling=1):
-#       color = [ORANGE,CYAN,GREEN,WHITE]
-#       nums = AA(range)(AA(len)(bases))
-#       hpcs = [submodel]
-#       for k in range(len(bases)):
-#           hpcs += [cellNumbering((V,bases[k]),submodel)
-#                       (nums[k],color[k],(0.5+0.1*k)*numberScaling)]
-#       return STRUCT(hpcs)
-#       #return EXPLODE(scalx,scaly,scalz)(hpcs)
-#   return larModelNumbering0
-#
-#
