@@ -11,9 +11,9 @@ import Base.cat
 	
 
 """ 
-	apply(affineMatrix::Matrix)::LAR
+	apply(affineMatrix::Matrix)(larmodel::LAR)::LAR
 
-
+Apply the `affineMatrix` parameter to the vertices of `larmodel`.
 """
 function apply(affineMatrix)
 	function apply0(larmodel)
@@ -22,11 +22,21 @@ function apply(affineMatrix)
 	return apply0
 end
 
+# Example
 
+```
+julia> square = LARLIB.cuboid([1,1])
+([0.0 0.0 1.0 1.0; 0.0 1.0 0.0 1.0], Array{Int64,1}[[1, 2, 3, 4]])
+
+julia> LARVIEW.apply(LARLIB.t(1,2))(square)
+([1.0 1.0 2.0 2.0; 2.0 3.0 2.0 3.0], Array{Int64,1}[[1, 2, 3, 4]])
+```
 """ 
 	comp(funs::Array)
 
+Standard mathematical composition. 
 
+Pipe execution from right to left on application to actual parameter.
 """
 function comp(funs)
     function compose(f,g)
@@ -39,9 +49,21 @@ end
 
 
 """
-	cons(funs)
+	cons(funs::Array)(x::Any)::Array
 
+*Construction* functional of FL and PLaSM languages.
 
+Provides a *vector* functional that returns the array of 
+applications of component functions to actual parameter.
+
+# Example 
+
+```
+julia> LARVIEW.cons([cos,sin])(0)
+2-element Array{Float64,1}:
+ 1.0
+ 0.0
+```
 """
 function cons(funs)
 	return x -> [f(x) for f in funs]
@@ -50,19 +72,43 @@ end
 
 
 """ 
-	k(AnyValue)
+	k(Any)(x)
 
+*Constant* functional of FL and PLaSM languages.
 
+Gives a constant functional that always returns the actual parameter
+when applied to another parameter.
+
+#	Examples
+
+```
+julia> LARVIEW.k(10)(100)
+10
+
+julia> LARVIEW.k(sin)(cos)
+sin
+```
 """
-function k(AnyValue)
-	x->AnyValue
+function k(Any)
+	x->Any
 end
 
 
 """ 
-	aa(fun)
+	aa(fun::Function)(args::Array)::Array
 
+AA applies fun to each element of the args sequence 
 
+# Example 
+
+```
+julia> LARVIEW.aa(sqrt)([1,4,9,16])
+4-element Array{Float64,1}:
+ 1.0
+ 2.0
+ 3.0
+ 4.0
+```
 """
 function aa(fun)
 	function aa1(args::Array)
@@ -74,8 +120,9 @@ end
 
 
 """ 
-	id = x->x
+	id(x::Anytype)
 
+Identity function.  Return the argument.
 
 """
 id = x->x
@@ -84,9 +131,25 @@ id = x->x
 
 	
 """ 
-	distr(args)
+	distr(args::Union{Tuple,Array})(x::Any)::Array
 
+Distribute right. Returns the `pair` array with the elements of `args` and `x`
 
+# Example 
+
+```
+julia> LARVIEW.distr(([1,2,3],10))
+3-element Array{Array{Int64,1},1}:
+ [1, 10]
+ [2, 10]
+ [3, 10]
+
+julia> LARVIEW.distr([[1,2,3],10])
+3-element Array{Array{Int64,1},1}:
+ [1, 10]
+ [2, 10]
+ [3, 10]
+```
 """
 function distr(args)
 	list,element = args
@@ -94,16 +157,6 @@ function distr(args)
 end
 
 
-
-
-""" 
-	cat(args)
-
-
-"""
-function cat(args)
-	return reduce( (x,y) -> append!(x,y), [], args )
-end
 
 
 #
@@ -283,8 +336,6 @@ function a2a(mat)
 	return a2a0
 end
 
-textwidth, textheight, textspacing = 0.1, 0.4, 0.05
-
 
 """ 
 	translate(c)(lar)
@@ -341,11 +392,6 @@ function textWithAttributes(textalignment="centre", textangle=0,
 		   charseq ])(strand)
 	end
 end
-
-
-View(textWithAttributes("left")("PLaSM"))
-View(textWithAttributes("centre")("PLaSM"))
-View(textWithAttributes("right")("PLaSM"))
  
 
 
