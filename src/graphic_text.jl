@@ -417,6 +417,20 @@ end
 
 
 
+
+""" 
+ 	cat(args)
+
+Redefined locally, as service to `textWithAttributes` implementation.
+"""
+import Base.cat
+function cat(args)
+	return reduce( (x,y) -> append!(x,y), [], args )
+end
+
+
+
+
 """ 
 	textWithAttributes(textalignment='centre', textangle=0, 
 		textwidth=1.0, textheight=2.0, textspacing=0.25)(strand::String)::LAR
