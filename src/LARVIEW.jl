@@ -548,5 +548,6 @@ module LARVIEW
 		return lar2exploded_hpc0
 	end
 
+   include("./graphic_text.jl")
 
 end # module
