@@ -3,6 +3,8 @@ using PyCall
 @pyimport pyplasm as p
 using LARLIB
 using LARVIEW
+import Base.cat
+
 
 L = LARLIB
 
@@ -13,13 +15,6 @@ View = LARVIEW.view
 	apply(affineMatrix::Matrix)(larmodel::LAR)::LAR
 
 Apply the `affineMatrix` parameter to the vertices of `larmodel`.
-"""
-function apply(affineMatrix)
-	function apply0(larmodel)
-		return L.struct2lar(L.Struct([ affineMatrix,larmodel ]))
-	end
-	return apply0
-end
 
 # Example
 
@@ -30,6 +25,16 @@ julia> square = LARLIB.cuboid([1,1])
 julia> LARVIEW.apply(LARLIB.t(1,2))(square)
 ([1.0 1.0 2.0 2.0; 2.0 3.0 2.0 3.0], Array{Int64,1}[[1, 2, 3, 4]])
 ```
+"""
+function apply(affineMatrix)
+	function apply0(larmodel)
+		return L.struct2lar(L.Struct([ affineMatrix,larmodel ]))
+	end
+	return apply0
+end
+
+
+
 """ 
 	comp(funs::Array)
 
@@ -417,13 +422,11 @@ end
 
 
 
-
 """ 
  	cat(args)
 
 Redefined locally, as service to `textWithAttributes` implementation.
 """
-import Base.cat
 function cat(args)
 	return reduce( (x,y) -> append!(x,y), [], args )
 end
@@ -438,6 +441,7 @@ end
 Partial implementation of the GKS's graphics primitive `text`.
 
 # Example
+
 ``` 
 LARVIEW.view(textWithAttributes("left")("PLaSM"))
 ```
