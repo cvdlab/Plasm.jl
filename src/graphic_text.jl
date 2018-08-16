@@ -499,34 +499,38 @@ Different `colors` and size are used for the various dimensional cells.
 
 ```
 model = LARLIB.cuboidGrid([3,4,2], true)
-LARVIEW.view(LARVIEW.numbering(model)) 
+LARVIEW.view(LARVIEW.numbering()(model)) 
 
 model = LARLIB.cuboidGrid([10,10], true)
-LARVIEW.view(LARVIEW.numbering(model))
+LARVIEW.view(LARVIEW.numbering(1.5)(model))
 ```
 """ 
-function numbering(model) 
-	V,cells = model
-	if size(V,1)==2 
-		V = embed(1)(model)[1]
-	end
-	wireframe = LARVIEW.lar2hpc(V,cells[2])
-	gcode = LARVIEW.textWithAttributes("centre", 0, 0.1, 0.2, 0.025)
-	scene = [wireframe]
-	for (h,skel) in enumerate(cells)
-		colors = [p.GREEN,p.YELLOW,p.CYAN,p.ORANGE]
-		nums = []
-		for (k,cell) in enumerate(skel)
-			center = sum([V[:,v] for v in cell])/length(cell)
-			code = embed(1)( gcode(string(k)) )
-			scaling = (0.6+0.1h,0.6+0.1h,1)
-			push!(nums, LARLIB.struct2lar( LARLIB.Struct([ 
-				LARLIB.t(center...), LARLIB.s(scaling...), code ]) ))
+function numbering(numberSizeScaling=1) 
+	function numbering0(model) 
+		V,cells = model
+		if size(V,1)==2 
+			V = LARVIEW.embed(1)(model)[1]
 		end
-		hpc = LARVIEW.lar2hpc(nums)
-		push!( scene, p.COLOR(colors[h])(hpc) )
+		wireframe = LARVIEW.lar2hpc(V,cells[2])
+		ns = numberSizeScaling
+		gcode = LARVIEW.textWithAttributes("centre", 0, 0.1ns, 0.2ns, 0.025ns)
+		scene = [wireframe]
+		for (h,skel) in enumerate(cells)
+			colors = [p.GREEN,p.YELLOW,p.CYAN,p.ORANGE]
+			nums = []
+			for (k,cell) in enumerate(skel)
+				center = sum([V[:,v] for v in cell])/length(cell)
+				code = LARVIEW.embed(1)( gcode(string(k)) )
+				scaling = (0.6+0.1h,0.6+0.1h,1)
+				push!(nums, LARLIB.struct2lar( LARLIB.Struct([ 
+					LARLIB.t(center...), LARLIB.s(scaling...), code ]) ))
+			end
+			hpc = LARVIEW.lar2hpc(nums)
+			push!( scene, p.COLOR(colors[h])(hpc) )
+		end
+		p.STRUCT( scene )
 	end
-	p.STRUCT( scene )
+	return numbering0
 end
 
 
