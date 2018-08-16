@@ -499,10 +499,10 @@ Different `colors` and size are used for the various dimensional cells.
 
 ```
 model = LARLIB.cuboidGrid([3,4,2], true)
-LARVIEW.view(numbering(model)) 
+LARVIEW.view(LARVIEW.numbering(model)) 
 
 model = LARLIB.cuboidGrid([10,10], true)
-LARVIEW.view(numbering(model))
+LARVIEW.view(LARVIEW.numbering(model))
 ```
 """ 
 function numbering(model) 
@@ -511,6 +511,7 @@ function numbering(model)
 		V = embed(1)(model)[1]
 	end
 	wireframe = LARVIEW.lar2hpc(V,cells[2])
+	gcode = LARVIEW.textWithAttributes("centre", 0, 0.1, 0.2, 0.025)
 	scene = [wireframe]
 	for (h,skel) in enumerate(cells)
 		colors = [p.GREEN,p.YELLOW,p.CYAN,p.ORANGE]
