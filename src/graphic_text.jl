@@ -1,13 +1,12 @@
+using DataStructures
 using PyCall
 @pyimport pyplasm as p
-
 using LARLIB
+using LARVIEW
+
 L = LARLIB
 
-using LARVIEW
 View = LARVIEW.view
-
-import Base.cat
 	
 
 """ 
@@ -159,7 +158,9 @@ end
 
 
 
-#
+# Vector definition of printable ASCII codes as one-dimensional LAR models.
+# Font design for *Geometric Programming for Computer-Aided Design*, Wiley, 2003. 
+
 ascii32 = ([0.0; 0.0],Array{Int64,1}[[1]])
 ascii33 = ([1.75 1.75 2.0 2.0 1.5 1.5; 1.75 5.5 0.5 1.0 1.0 0.5],Array{Int64,1}[[1,2],[3,4],[4,5],[5,6],[6,3]])
 ascii34 = ([1.0 2.0 2.0 2.0 1.5 1.5 2.0 3.0 3.0 3.0 2.5 2.5; 4.0 5.0 5.5 6.0 6.0 5.5 4.0 5.0 5.5 6.0 6.0 5.5],Array{Int64,1}[[1,2],[2,3],[3,4],[4,5],[5,6],[6,3],[7,8],[8,9],[9,10],[10,11],[11,12],[12,9]])
@@ -275,7 +276,30 @@ hpcs = [
 	ascii122,ascii123,ascii124,ascii125,ascii126 ]
 
 
-#	
+""" 
+	ascii_LAR::DataStructures.OrderedDict
+
+*Ordered dictionary* of printable ASCII codes as one-dimensional *LAR models* in 2D.
+
+`Key` is the `integer` ASCII code between 32 and 126.
+Font design: *Geometric Programming for Computer-Aided Design*, Wiley, 2003. 
+
+# Example
+```
+julia> ascii_LAR[46]
+([2.0 2.0 … 1.5 2.0; 0.0 0.5 … 0.0 0.0], Array{Int64,1}[[1, 2], [2, 3], [3, 4], [4, 5]])
+
+julia> ascii_LAR[126]
+([1.0 1.75 2.75 3.5; 5.0 5.5 5.0 5.5], Array{Int64,1}[[1, 2], [2, 3], [3, 4]])
+```
+"""
+ascii_LAR = OrderedDict(zip(32:126,LARVIEW.hpcs))
+
+
+
+# Attributes for `text` 2D graphics primitive. 
+# Reference to GKS ISO Graphics Standard (ISO/IEC 7942-4:1998)
+
 const textalignment = "centre" #default value
 const textangle = pi/4 #default value
 const textwidth = 1.0 #default value
@@ -287,43 +311,67 @@ const fontspacing = 1.0 #default value
 
 
 """ 
-	charpols(charlist)
+	charpols(mystring::String)::Array{LAR,1}
 
-
+Return the `array` of `LAR` models, for chars in `mystring`.
 """
-function charpols(charlist)
-    return [hpcs[code] for code in [Int(char[1])-31 for char in charlist]]
+function charpols(mystring)
+    return [ascii_LAR[code] for code in [Int(char) for char in mystring]]
 end
 
 
 
 """ 
-	charseq(string)
+	charseq(mystring::String)::Array{Char,1}
 
-
+# Example
+```
+julia> LARVIEW.charseq("PLaSM")
+5-element Array{Char,1}:
+ 'P'
+ 'L'
+ 'a'
+ 'S'
+ 'M'
+```
 """
-function charseq(string)
-	return [string[i] for i=1:length(string)]
+function charseq(mystring)
+	return [char for char in mystring]
 end
 
 
 """ 
-	text(strand::String)::LAR
+	text(mystring::String)::LAR
 
+Compute the one-dim *LAR model* drawing the contents of `mystring`
 
+# Example
+```
+julia> model = LARVIEW.text("PLaSM")
+LARVIEW.text("PLaSM") = ([0.0 0.0 3.0 4.0 4.0 3.0 0.0 9.0 5.0 5.0 14.0 13.0 11.0 10.0 
+10.0 11.0 13.0 14.0 14.0 14.0 15.0 16.0 18.0 19.0 19.0 18.0 16.0 15.0 15.0 16.0 18.0 
+19.0 20.0 20.0 22.0 24.0 24.0; 0.0 6.0 6.0 5.0 3.0 2.0 2.0 0.0 0.0 6.0 1.0 0.0 0.0 1.0 
+2.0 3.0 3.0 2.0 0.0 3.0 1.0 0.0 0.0 1.0 2.0 3.0 3.0 4.0 5.0 6.0 6.0 5.0 0.0 6.0 4.0 
+6.0 0.0], 
+Array{Int64,1}[[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[8,9],[9,10],[11,12],[12,13],[13,14],
+[14,15],[15,16],[16,17],[17,18],[18,11],[19,20],[21,22],[22,23],[23,24],[24,25],[25,26],
+[26,27],[27,28],[28,29],[29,30],[30,31],[31,32],[33,34],[34,35],[35,36],[36,37]])
+
+julia> LARVIEW.view(model)
+```
 """
-function text(strand)
+function text(mystring)
 	out = comp([ L.struct2lar, L.Struct, cat, distr,
-			cons([ charpols, k(L.t(fontspacing+fontwidth,0)) ]),charseq ])(strand)
+			cons([ charpols, k(L.t(fontspacing+fontwidth,0)) ]),charseq ])(mystring)
 	return out
 end
 
 
 
 """ 
-	a2a(mat)
+	a2a(mat::Matrix)(models::Array{LAR,1})::Struct.body
 
-
+Local function, service to `textWithAttributes` implementation.
 """
 function a2a(mat)
 	function a2a0(models)
@@ -338,24 +386,24 @@ end
 
 
 """ 
-	translate(c)(lar)
+	translate(c::Number)(lar::LAR)::LAR
 
-
+Local function, service to `textWithAttributes` implementation.
 """
 function translate(c)
 	function translate0(lar) 
 		xs = lar[1][1,:]
 		width = maximum(xs) - minimum(xs)
-		apply(L.t(width/c,0))(lar)
+		apply(LARLIB.t(width/c,0))(lar)
 	end
 	return translate0
 end
 
 
 """ 
-	align(textalignment="centre")
+	align(textalignment="centre"::String)(model::LAR)::LAR
 
-
+Local function, service to `textWithAttributes` implementation.
 """
 function align(textalignment="centre")
 	function align1(model)
@@ -373,7 +421,12 @@ end
 	textWithAttributes(textalignment='centre', textangle=0, 
 		textwidth=1.0, textheight=2.0, textspacing=0.25)(strand::String)::LAR
 
+Partial implementation of the GKS's graphics primitive `text`.
 
+# Example
+``` 
+LARVIEW.view(textWithAttributes("left")("PLaSM"))
+```
 """
 function textWithAttributes(textalignment="centre", textangle=0, 
 							textwidth=1.0, textheight=2.0, textspacing=0.25) 
