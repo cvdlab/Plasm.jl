@@ -407,7 +407,7 @@ module LARVIEW
 				for cell in skeleton
 					vcell = hcat([[verts[h,k] for h=1:size(verts,1)] for k in cell]...)
 				
-					center = sum([V[:,v] for v in cell])/length(cell)
+					center = sum([verts[:,v] for v in cell])/length(cell)
 					scaled_center = length(center)==2 ? center.*[sx,sy] :  
 														center.*[sx,sy,sz]
 					translation_vector = scaled_center-center
