@@ -399,22 +399,22 @@ module LARVIEW
 	julia> view(hpc)
 	```
 	"""
-	function hpc_exploded( model::LARmodel )
-		function hpc_exploded0( sx=1.2, sy=1.2, sz=1.2 )::Hpc
+	function hpc_exploded( model )
+		function hpc_exploded0( sx=1.2, sy=1.2, sz=1.2 )
 			verts,cells = model
 			out = []
-			for skeleton in cells[2:end]
+			for skeleton in cells
 				for cell in skeleton
 					vcell = hcat([[verts[h,k] for h=1:size(verts,1)] for k in cell]...)
 				
-					center = centroid(vcell)
+					center = sum([V[:,v] for v in cell])/length(cell)
 					scaled_center = length(center)==2 ? center.*[sx,sy] :  
 														center.*[sx,sy,sz]
 					translation_vector = scaled_center-center
 					vcell = vcell .+ translation_vector
 		
-					py_verts = points2py(vcell)
-					py_cells = cells2py( [collect(1:size(vcell,2))] )
+					py_verts = LARVIEW.points2py(vcell)
+					py_cells = LARVIEW.cells2py( [collect(1:size(vcell,2))] )
 					
 					hpc = p.MKPOL([ py_verts, py_cells, [] ])
 					push!(out, hpc)
