@@ -13,3 +13,5 @@ VV = [[k] for k=1:size(V,2)]
 model = (V, (VV,EV,FV))
 
 View(LARVIEW.numbering(2.)(model))
+
+View(LARVIEW.hpc_exploded( model )(1.5,1.5,1.5))
