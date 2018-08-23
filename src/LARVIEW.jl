@@ -2,7 +2,6 @@ module LARVIEW
 
 	#export centroid, cuboidGrid, mkpol, view, hpc_exploded, lar2hpc
 
-	using SparseArrays
 	using LARLIB
 	using PyCall
 	
@@ -44,7 +43,7 @@ module LARVIEW
 	`nnz=1` with `value=1` for the coordinates of an *elementary N-chain*, constituted by 
 	a single *N-chain*.
 	"""
-	const Chain = SparseArrays.SparseVector{Int8,Int}
+	const Chain = SparseVector{Int8,Int}
 	
 	
 	"""
@@ -58,7 +57,7 @@ module LARVIEW
 	`ChainOp` with elements in ``\{-1,0,1\}`` or in ``\{0,1\}``, for 
 	*signed* and *unsigned* operators, respectively.
 	"""
-	const ChainOp = SparseArrays.SparseMatrixCSC{Int8,Int}
+	const ChainOp = SparseMatrixCSC{Int8,Int}
 	
 	
 	"""
