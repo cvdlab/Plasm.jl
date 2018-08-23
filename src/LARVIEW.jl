@@ -329,7 +329,9 @@ module LARVIEW
 	julia> typeof(LARLIB.cuboid([1,1,1])::LAR)
 	Tuple{Array{Float64,2},Array{Array{Int64,1},1}}
 		
-	julia> LARVIEW.view(LARLIB.cuboid([1,1,1]))
+	julia> V,(VV,EV,FV,CV) = LARLIB.cuboid([1,1,1], true);
+		
+	julia> LARVIEW.view( (V,FV) );
 	```
 	"""
 	function view(pair::Tuple{Points,Cells})
@@ -376,8 +378,19 @@ module LARVIEW
 	
 		`evalStruct(scene::Struct)::Array{Any,1}`
 	
+	``` 
+	cube = LARLIB.apply( LARLIB.t(-.5,-.5,0), LARLIB.cuboid([1,1,1]));
+	tableTop = LARLIB.Struct([ LARLIB.t(0,0,.85), LARLIB.s(1,1,.05), cube ]);
+	tableLeg = LARLIB.Struct([ LARLIB.t(-.475,-.475,0), LARLIB.s(.1,.1,.89), cube ]);
+	tablelegs = LARLIB.Struct( repeat([ tableLeg, LARLIB.r(0,0,pi/2) ],outer=4) );
+	table = LARLIB.Struct([ tableTop, tablelegs ]);
+
+	scene = LARLIB.evalStruct(table);
+	# output
+	# 5-element Array{Any,1}
 	
-	
+	LARVIEW.view(scene)
+	```
 	"""
 	function view(scene::Array{Any,1})
 		if prod([isa(item[1:2],LARLIB.LAR) for item in scene])
@@ -396,7 +409,7 @@ module LARVIEW
 	
 	# Example
 	```julia
-	julia> hpc = LARVIEW.hpc_exploded(LARLIB.cuboidGrid([1,2,3], true))(1.5,1.5,1.5)
+	julia> hpc = LARVIEW.hpc_exploded(LARLIB.cuboidGrid([3,2,1], true))(1.5,1.5,1.5)
 	
 	julia> view(hpc)
 	```
@@ -449,8 +462,7 @@ module LARVIEW
 	PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 
 	'std::shared_ptr< Hpc > *' at 0x12cf45d50> >
 
-	julia> 
-	view(hpc)	
+	julia> view(hpc)	
 	[...]
 	```
 	"""
@@ -520,32 +532,30 @@ module LARVIEW
 
 
 	"""
-		lar2exploded_hpc(V::Points,CV::Cells)::Hpc
-
-	Return an *exploded* `Hpc` object starting from a `V::Points` and a `CV::Cells` 
-	object, after exploding cells in `CV` with 
-	scale `sx,sy,sz` parameters. Every cell is *translated* by the vector difference 
-	between its *scaled centroid* and its *centroid*. Every cell is transformed in a 
-	single `LAR` object before explosion. *HPC = Hierarchical Polyhedral Complex* 
-	is the geometric data structure 
-	used by `PLaSM` (Programming LAnguage for Solid Modeling). See the Wiley's book 
-	[*Geometric Programming for Computer-Aided Design*]
-	(https://onlinelibrary.wiley.com/doi/book/10.1002/0470013885) and its 
-	current `Python` library [*https://github.com/plasm-language/pyplasm*]
-	(https://github.com/plasm-language/pyplasm).
+		lar2exploded_hpc(V::LARLIB.Points,CV::LARLIB.Cells)::Hpc
 	
-	BUG (Julia?, PyCall?):  
-	hpc_exploded( (V,cells) )(sx,sy,sz)  ==>  OK
-	hpc_exploded( (V,[cells[4]]) )(sx,sy,sz)  ==> KO
-	with typeof(cells) == typeof([cells[4]]) == true
+	Input `V::Points` and `CV::Cells`. Output an *exploded* `Hpc`   
+	object,  exploding cells in `CV` with scale `sx,sy,sz` parameters. 
 	
-	V,cells = LARLIB.cuboidGrid([3,3,1],true)
-	LARVIEW.lar2exploded_hpc(V::Points,cells[4]::Cells)()
+	Every cell is *translated* by the vector difference 
+	between its *scaled centroid* and its *centroid*. 
+	
+	*HPC = Hierarchical Polyhedral Complex* is the geometric data structure 
+	used by `PLaSM` (Programming LAnguage for Solid Modeling). 
+	
+	#	Example
+	
+	```
+	julia> V,cells = LARLIB.cuboidGrid([3,3,1], true)
+	
+	julia> hpc = LARVIEW.lar2exploded_hpc(V::LARLIB.Points, cells[4]::LARLIB.Cells)()
 
+	julia> LARVIEW.view(hpc)
+	```
 	"""
-	function lar2exploded_hpc(V::Points,cells::Array{Cells,1})
+	function lar2exploded_hpc(V::LARLIB.Points, cells::LARLIB.Cells)
 		function lar2exploded_hpc0(sx=1.2, sy=1.2, sz=1.2)
-			hpc = hpc_exploded( (V,cells) )(sx,sy,sz)
+			hpc = LARVIEW.hpc_exploded( (V,[cells]) )(sx,sy,sz)
 		end
 		return lar2exploded_hpc0
 	end

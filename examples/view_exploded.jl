@@ -1,6 +1,6 @@
 using LARVIEW
 using PyCall
-@pyimport larlib as p
+@pyimport pyplasm as p
 
 geom_0 = hcat([[x] for x=0.:10]...)
 topol_0 = [[i,i+1] for i=1:9]
@@ -14,7 +14,9 @@ model_3 = LARLIB.larModelProduct(model_2, model_1)
 
 
 p.VIEW(LARVIEW.lar2hpc(model_3...))
-LARVIEW.viewexploded(model_3...)
+V,CV = model_3
+hpc = LARVIEW.hpc_exploded( (V,[CV]) )(1.5,1.5,1.5)
+LARVIEW.view(hpc)
 LARVIEW.viewexploded(model_3[1],model_3[2])
 
 shape = (10,10,2)
