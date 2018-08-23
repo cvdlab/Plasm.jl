@@ -7,7 +7,8 @@ makedocs(
 	sitename = "LARVIEW.jl",
 	pages = [
 		"Home" => "index.md",
-		"LARVIEW" => "larview.md",
+		"Visualization" => "larview.md",
+		"Numbering" => "numbering.md",
 		"Glossary" => "glossary.md"
 	]
 )

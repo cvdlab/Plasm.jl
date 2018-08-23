@@ -66,5 +66,9 @@ Another set of methods will be dedicated to *display cell indices* of various ce
 ## Main Interface
 
 ```@docs
-LARVIEW.larview
+LARVIEW.view
+```
+
+```@docs
+LARVIEW.hpc_exploded
 ```

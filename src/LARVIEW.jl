@@ -2,8 +2,8 @@ module LARVIEW
 
 	#export centroid, cuboidGrid, mkpol, view, hpc_exploded, lar2hpc
 
+	using SparseArrays
 	using LARLIB
-	
 	using PyCall
 	
 	@pyimport pyplasm as p
@@ -44,7 +44,7 @@ module LARVIEW
 	`nnz=1` with `value=1` for the coordinates of an *elementary N-chain*, constituted by 
 	a single *N-chain*.
 	"""
-	const Chain = SparseVector{Int8,Int}
+	const Chain = SparseArrays.SparseVector{Int8,Int}
 	
 	
 	"""
@@ -58,7 +58,7 @@ module LARVIEW
 	`ChainOp` with elements in ``\{-1,0,1\}`` or in ``\{0,1\}``, for 
 	*signed* and *unsigned* operators, respectively.
 	"""
-	const ChainOp = SparseMatrixCSC{Int8,Int}
+	const ChainOp = SparseArrays.SparseMatrixCSC{Int8,Int}
 	
 	
 	"""
@@ -273,12 +273,12 @@ module LARVIEW
 	```julia
 	julia> V,(VV,EV,FV,CV) = LARLIB.cuboid([1,1,1],true);
 	
-	julia> LARVIEW.mkpol(V,EV)
+	julia> LARVIEW.mkpol(V,CV)
 	PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 
 	'std::shared_ptr< Hpc > *' at 0x12cf45d50> >
 
 	julia> 
-	LARVIEW.view(LARVIEW.mkpol(V,EV))	
+	LARVIEW.view(LARVIEW.mkpol(V,CV))	
 	[...]
 	```
 	"""
@@ -303,7 +303,9 @@ module LARVIEW
 	julia> typeof( LARLIB.cuboid([1,1,1], true) )
 	Tuple{Array{Float64,2},Array{Array{Int64,1},1}}
 	
-	julia> LARVIEW.view( LARLIB.cuboid([1,1,1], true) )
+	julia> V,(VV,EV,FV,CV) = LARLIB.cuboid([.5,.5,.5], true);
+	
+	julia> LARVIEW.view( (V,[VV,EV,FV,CV]) )
 	```
 	"""
 	function view(model::LARmodel)

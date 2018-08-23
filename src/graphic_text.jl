@@ -135,9 +135,10 @@ id = x->x
 
 	
 """ 
-	distr(args::Union{Tuple,Array})(x::Any)::Array
+	distr(args::Union{Tuple,Array})::Array
 
-Distribute right. Returns the `pair` array with the elements of `args` and `x`
+Distribute right. The parameter `args` must contain a `list` and an element `x`. 
+Return the `pair` array with the elements of `args` coupled with `x`
 
 # Example 
 
@@ -158,6 +159,36 @@ julia> LARVIEW.distr([[1,2,3],10])
 function distr(args)
 	list,element = args
 	return [ [e,element] for e in list ]
+end
+
+
+
+	
+""" 
+	distl(args::Union{Tuple,Array})::Array
+
+Distribute right. The parameter `args` must contain an element `x` and a `list`. 
+Return the `pair` array with `x` coupled with the elements of `args`. 
+
+# Example 
+
+```
+julia> LARVIEW.distl((10, [1,2,3]))
+3-element Array{Array{Int64,1},1}:
+ [10, 1]
+ [10, 2]
+ [10, 3]
+
+julia> LARVIEW.distl([10, [1,2,3]])
+3-element Array{Array{Int64,1},1}:
+ [10, 1]
+ [10, 2]
+ [10, 3]
+```
+"""
+function distl(args)
+	element, list = args
+	return [ [element, e] for e in list ]
 end
 
 
@@ -291,10 +322,10 @@ Font design: *Geometric Programming for Computer-Aided Design*, Wiley, 2003.
 
 # Example
 ```
-julia> ascii_LAR[46]
+julia> LARVIEW.ascii_LAR[46]
 ([2.0 2.0 … 1.5 2.0; 0.0 0.5 … 0.0 0.0], Array{Int64,1}[[1, 2], [2, 3], [3, 4], [4, 5]])
 
-julia> ascii_LAR[126]
+julia> LARVIEW.ascii_LAR[126]
 ([1.0 1.75 2.75 3.5; 5.0 5.5 5.0 5.5], Array{Int64,1}[[1, 2], [2, 3], [3, 4]])
 ```
 """
@@ -353,7 +384,8 @@ Compute the one-dim *LAR model* drawing the contents of `mystring`
 # Example
 ```
 julia> model = LARVIEW.text("PLaSM")
-LARVIEW.text("PLaSM") = ([0.0 0.0 3.0 4.0 4.0 3.0 0.0 9.0 5.0 5.0 14.0 13.0 11.0 10.0 
+# output 
+([0.0 0.0 3.0 4.0 4.0 3.0 0.0 9.0 5.0 5.0 14.0 13.0 11.0 10.0 
 10.0 11.0 13.0 14.0 14.0 14.0 15.0 16.0 18.0 19.0 19.0 18.0 16.0 15.0 15.0 16.0 18.0 
 19.0 20.0 20.0 22.0 24.0 24.0; 0.0 6.0 6.0 5.0 3.0 2.0 2.0 0.0 0.0 6.0 1.0 0.0 0.0 1.0 
 2.0 3.0 3.0 2.0 0.0 3.0 1.0 0.0 0.0 1.0 2.0 3.0 3.0 4.0 5.0 6.0 6.0 5.0 0.0 6.0 4.0 
@@ -443,7 +475,7 @@ Partial implementation of the GKS's graphics primitive `text`.
 # Example
 
 ``` 
-LARVIEW.view(textWithAttributes("left")("PLaSM"))
+LARVIEW.view(LARVIEW.textWithAttributes("left", pi/4)("PLaSM"))
 ```
 """
 function textWithAttributes(textalignment="centre", textangle=0, 
