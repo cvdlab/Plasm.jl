@@ -558,6 +558,19 @@ module LARVIEW
 		end
 		return lar2exploded_hpc0
 	end
+	
+	function viewexploded(V::LARLIB.Points, cells::LARLIB.Cells)
+		function lar2exploded_hpc0(sx=1.2, sy=1.2, sz=1.2)
+			hpc = LARVIEW.hpc_exploded( (V,[cells]) )(sx,sy,sz)
+			LARVIEW.view(hpc)
+		end
+		return lar2exploded_hpc0
+	end
+	
+	
+	
+	
+	
 
    include("./graphic_text.jl")
 
