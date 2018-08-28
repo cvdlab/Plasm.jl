@@ -1,6 +1,6 @@
 # LARVIEW.jl
 
-Useful module to visualize [LinearAlgebraicRepresentation.jl](https://github.com/cvdlab/LinearAlgebraicRepresentation.jl) structures via [PyPLASM](https://github.com/plasm-language/pyplasm)
+Graphics module to visualize [LinearAlgebraicRepresentation.jl](https://github.com/cvdlab/LinearAlgebraicRepresentation.jl) structures via [PyPLASM](https://github.com/plasm-language/pyplasm)
 
 ### Version
 0.3.0
