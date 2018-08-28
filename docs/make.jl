@@ -4,7 +4,7 @@ using Documenter, LARVIEW
 
 makedocs(
 	format = :html,
-	sitename = "LARVIEW.jl",
+	sitename = "Plasm.jl",
 	pages = [
 		"Home" => "index.md",
 		"Visualization" => "larview.md",
