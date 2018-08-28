@@ -1,10 +1,10 @@
 push!(LOAD_PATH,"../src/")
 
-using Documenter, LARVIEW
+using Documenter, Plasm
 
 makedocs(
 	format = :html,
-	sitename = "LARVIEW.jl",
+	sitename = "Plasm.jl",
 	pages = [
 		"Home" => "index.md",
 		"Visualization" => "larview.md",

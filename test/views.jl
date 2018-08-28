@@ -1,8 +1,10 @@
-using LARVIEW
-using Base.Test
+#using Plasm
+using LinearAlgebraicRepresentation
+using Test
 using PyCall
-@pyimport larlib as p
-
+p = PyCall.pyimport("pyplasm")
+p_STRUCT = p["STRUCT"]
+p_MKPOL = p["MKPOL"]
 
 @testset "View p.STRUCT" begin
 	geom_0 = hcat([[x] for x=0.:1.]...);
@@ -11,8 +13,8 @@ using PyCall
 	topol_1 = [[i,i+1] for i=1:2];
 	model_0 = (geom_0,topol_0);
 	model_1 = (geom_1,topol_1);
-	model_2 = LARLIB.larModelProduct(model_0,model_1);
-	model_3 = LARLIB.larModelProduct(model_2,model_0);
+	model_2 = LinearAlgebraicRepresentation.larModelProduct(model_0,model_1);
+	model_3 = LinearAlgebraicRepresentation.larModelProduct(model_2,model_0);
 	V,CV = model_3;
 	
 	@test typeof(V) == Array{Float64,2}
@@ -24,10 +26,10 @@ using PyCall
 	W = [Any[V[h,k] for h=1:size(V,1)] for k=1:size(V,2)];
 	
 	@test typeof(PyObject([W,CV,[]])) == PyCall.PyObject
-	@test typeof(p.MKPOLS(PyObject([W,CV,[]]))) == Array{PyCall.PyObject,1}
-	@test typeof(p.STRUCT(p.MKPOLS(PyObject([W,CV,[]])))) == PyCall.PyObject
-	@test repr(W) == "Array{Any,1}[Any[0.0, 0.0, 0.0], Any[0.0, 0.0, 0.0], Any[0.0, 0.0, 1.0], Any[0.0, 0.5, 0.0], Any[0.0, 0.5, 1.0], Any[0.0, 1.0, 0.0], Any[0.0, 1.0, 1.0], Any[1.0, 0.0, 0.0], Any[1.0, 0.0, 1.0], Any[1.0, 0.5, 0.0], Any[1.0, 0.5, 1.0], Any[1.0, 1.0, 0.0], Any[1.0, 1.0, 1.0]]"
-	@test repr(CV) == "Array{Int64,1}[[1, 2, 3, 4, 7, 8, 9, 10], [3, 4, 5, 6, 9, 10, 11, 12]]"
-	@test typeof(p.EXPLODE(1.2,1.2,1.2)(p.MKPOLS(PyObject([W,CV,[]])))) == PyCall.PyObject
+#	@test typeof(p.MKPOLS(PyObject([W,CV,[]]))) == Array{PyCall.PyObject,1}
+#	@test typeof(p.STRUCT(p.MKPOLS(PyObject([W,CV,[]])))) == PyCall.PyObject
+#	@test repr(W) == "Array{Any,1}[Any[0.0, 0.0, 0.0], Any[0.0, 0.0, 0.0], Any[0.0, 0.0, 1.0], Any[0.0, 0.5, 0.0], Any[0.0, 0.5, 1.0], Any[0.0, 1.0, 0.0], Any[0.0, 1.0, 1.0], Any[1.0, 0.0, 0.0], Any[1.0, 0.0, 1.0], Any[1.0, 0.5, 0.0], Any[1.0, 0.5, 1.0], Any[1.0, 1.0, 0.0], Any[1.0, 1.0, 1.0]]"
+#	@test repr(CV) == "Array{Int64,1}[[1, 2, 3, 4, 7, 8, 9, 10], [3, 4, 5, 6, 9, 10, 11, 12]]"
+#	@test typeof(p.EXPLODE(1.2,1.2,1.2)(p.MKPOLS(PyObject([W,CV,[]])))) == PyCall.PyObject
 end
 

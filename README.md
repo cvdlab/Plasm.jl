@@ -9,7 +9,7 @@ Viewer for [LinearAlgebraicRepresentation.jl](https://github.com/cvdlab/LinearAl
 
 Follow the simple README instructions, depending on your Python installation, to install `pyplasm` from [https://github.com/plasm-language/pyplasm](https://github.com/plasm-language/pyplasm) repo.
 
-Just run `Pkg.clone("https://github.com/cvdlab/LARVIEW.jl")` within a Julia console.
+Just run `Pkg.clone("https://github.com/cvdlab/Plasm.jl")` within a Julia console.
 
 ## API
 
