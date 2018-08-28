@@ -1,6 +1,6 @@
 try
-   Pkg.installed("LARLIB")
+   Pkg.installed("LinearAlgebraicRepresentation")
 catch
-   Pkg.clone("https://github.com/cvdlab/LARLIB.jl.git")
-   Pkg.build("LARLIB")
+   Pkg.clone("https://github.com/cvdlab/LinearAlgebraicRepresentation.jl.git")
+   Pkg.build("LinearAlgebraicRepresentation")
 end

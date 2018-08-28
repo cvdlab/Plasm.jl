@@ -1,17 +1,17 @@
-# LARLIB.jl
+# LinearAlgebraicRepresentation.jl
 
 ## Dependencies
 
 `LARVIEW.jl` has one Julia dependency and one Python dependency:
 
-- [LARLIB](https://github.com/cvdlab/LARLIB.jl)
+- [LinearAlgebraicRepresentation](https://github.com/cvdlab/LinearAlgebraicRepresentation.jl)
 - [Pyplasm](https://github.com/plasm-language/pyplasm)
 
 
 ## Docstrings conventions
 
 **Bold** is used to point out theory concepts. For example, look at the 
-"**2-skeletons**" word in the docstring of `LARLIB.skel_merge`:
+"**2-skeletons**" word in the docstring of `LinearAlgebraicRepresentation.skel_merge`:
 ```@docs
 cuboidGrid(shape::Array{Int64,1}[, full=false])::Union{LAR,LAR_Model}
 ```

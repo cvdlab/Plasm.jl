@@ -1,12 +1,12 @@
 using DataStructures
 using PyCall
 @pyimport pyplasm as p
-using LARLIB
+using LinearAlgebraicRepresentation
 using LARVIEW
 import Base.cat
 
 
-L = LARLIB
+L = LinearAlgebraicRepresentation
 
 View = LARVIEW.view
 	
@@ -19,10 +19,10 @@ Apply the `affineMatrix` parameter to the vertices of `larmodel`.
 # Example
 
 ```
-julia> square = LARLIB.cuboid([1,1])
+julia> square = LinearAlgebraicRepresentation.cuboid([1,1])
 ([0.0 0.0 1.0 1.0; 0.0 1.0 0.0 1.0], Array{Int64,1}[[1, 2, 3, 4]])
 
-julia> LARVIEW.apply(LARLIB.t(1,2))(square)
+julia> LARVIEW.apply(LinearAlgebraicRepresentation.t(1,2))(square)
 ([1.0 1.0 2.0 2.0; 2.0 3.0 2.0 3.0], Array{Int64,1}[[1, 2, 3, 4]])
 ```
 """
@@ -414,7 +414,7 @@ function a2a(mat)
 	function a2a0(models)
 		assembly = []
 		for model in models
-			push!( assembly, LARLIB.Struct([ mat,model ]) )
+			push!( assembly, LinearAlgebraicRepresentation.Struct([ mat,model ]) )
 		end
 		assembly
 	end
@@ -431,7 +431,7 @@ function translate(c)
 	function translate0(lar) 
 		xs = lar[1][1,:]
 		width = maximum(xs) - minimum(xs)
-		apply(LARLIB.t(width/c,0))(lar)
+		apply(LinearAlgebraicRepresentation.t(width/c,0))(lar)
 	end
 	return translate0
 end
@@ -482,16 +482,16 @@ function textWithAttributes(textalignment="centre", textangle=0,
 							textwidth=1.0, textheight=2.0, textspacing=0.25) 
 	function textWithAttributes(strand)
 		id = x->x
-		mat = LARLIB.s(textwidth/fontwidth,textheight/fontheight)
+		mat = LinearAlgebraicRepresentation.s(textwidth/fontwidth,textheight/fontheight)
 		comp([ 
-		   apply(LARLIB.r(textangle)),
+		   apply(LinearAlgebraicRepresentation.r(textangle)),
 		   align(textalignment),
 		   L.struct2lar,
 		   L.Struct,
 		   cat,
 		   distr,
 		   cons([ a2a(mat) ∘ charpols, 
-				k(LARLIB.t(textwidth+textspacing,0)) ]),
+				k(LinearAlgebraicRepresentation.t(textwidth+textspacing,0)) ]),
 		   charseq ])(strand)
 	end
 end
@@ -506,7 +506,7 @@ The embedding is done by adding ``d`` zero coordinates to each vertex.
 # Example
 
 ```
-julia> square = LARLIB.cuboid([1,1])
+julia> square = LinearAlgebraicRepresentation.cuboid([1,1])
 ([0.0 0.0 1.0 1.0; 0.0 1.0 0.0 1.0], Array{Int64,1}[[1, 2, 3, 4]])
 
 julia> embed(1)(square)
@@ -530,10 +530,10 @@ Different `colors` and size are used for the various dimensional cells.
 # Examples
 
 ```
-model = LARLIB.cuboidGrid([3,4,2], true)
+model = LinearAlgebraicRepresentation.cuboidGrid([3,4,2], true)
 LARVIEW.view(LARVIEW.numbering()(model)) 
 
-model = LARLIB.cuboidGrid([10,10], true)
+model = LinearAlgebraicRepresentation.cuboidGrid([10,10], true)
 LARVIEW.view(LARVIEW.numbering(1.5)(model))
 ```
 """ 
@@ -554,8 +554,8 @@ function numbering(numberSizeScaling=1)
 				center = sum([V[:,v] for v in cell])/length(cell)
 				code = LARVIEW.embed(1)( gcode(string(k)) )
 				scaling = (0.6+0.1h,0.6+0.1h,1)
-				push!(nums, LARLIB.struct2lar( LARLIB.Struct([ 
-					LARLIB.t(center...), LARLIB.s(scaling...), code ]) ))
+				push!(nums, LinearAlgebraicRepresentation.struct2lar( LinearAlgebraicRepresentation.Struct([ 
+					LinearAlgebraicRepresentation.t(center...), LinearAlgebraicRepresentation.s(scaling...), code ]) ))
 			end
 			hpc = LARVIEW.lar2hpc(nums)
 			push!( scene, p.COLOR(colors[h])(hpc) )

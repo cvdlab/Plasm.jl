@@ -1,7 +1,7 @@
 using LARVIEW
 using Base.Test
 using PyCall
-@pyimport larlib as p
+@pyimport LinearAlgebraicRepresentation as p
 
 
 @testset "View p.STRUCT" begin
@@ -11,8 +11,8 @@ using PyCall
 	topol_1 = [[i,i+1] for i=1:2];
 	model_0 = (geom_0,topol_0);
 	model_1 = (geom_1,topol_1);
-	model_2 = LARLIB.larModelProduct(model_0,model_1);
-	model_3 = LARLIB.larModelProduct(model_2,model_0);
+	model_2 = LinearAlgebraicRepresentation.larModelProduct(model_0,model_1);
+	model_3 = LinearAlgebraicRepresentation.larModelProduct(model_2,model_0);
 	V,CV = model_3;
 	
 	@test typeof(V) == Array{Float64,2}
