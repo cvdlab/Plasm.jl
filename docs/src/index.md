@@ -4,7 +4,7 @@
 
 `Plasm.jl` has one Julia dependency and one Python dependency:
 
-- [LARLIB](https://github.com/cvdlab/LinearAlgebraicRepresentation.jl)
+- [LinearAlgebraicRepresentation](https://github.com/cvdlab/LinearAlgebraicRepresentation.jl)
 - [Pyplasm](https://github.com/plasm-language/pyplasm)
 
 

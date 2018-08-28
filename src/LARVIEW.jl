@@ -2,7 +2,7 @@ module LARVIEW
 
 	#export centroid, cuboidGrid, mkpol, view, hpc_exploded, lar2hpc
 
-	using LARLIB
+	using LinearAlgebraicRepresentation
 	using PyCall
 	
 	@pyimport pyplasm as p

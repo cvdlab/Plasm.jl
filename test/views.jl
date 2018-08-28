@@ -1,7 +1,7 @@
 using LARVIEW
 using Base.Test
 using PyCall
-@pyimport larlib as p
+@pyimport LinearAlgebraicRepresentation as p
 
 
 @testset "View p.STRUCT" begin

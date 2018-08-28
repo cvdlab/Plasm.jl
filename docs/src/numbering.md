@@ -31,7 +31,7 @@ The geometry of 2D faces can be computed -- as a minimal basis of *cycles* (chai
 
 ## Numbering cellular complexes
 
-To get a proper view of data types used by `LARVIEW` and `LARLIB` packages, look at the
+To get a proper view of data types used by `LARVIEW` and `LinearAlgebraicRepresentation` packages, look at the
 [Glossary](glossary.md) document.
 
 

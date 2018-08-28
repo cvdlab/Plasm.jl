@@ -3,7 +3,7 @@
 
 using LARVIEW
 using PyCall
-@pyimport larlib as p
+@pyimport LinearAlgebraicRepresentation as p
 
 
 #####

@@ -1,5 +1,5 @@
-using LARLIB
-L = LARLIB
+using LinearAlgebraicRepresentation
+L = LinearAlgebraicRepresentation
 
 using LARVIEW
 View = Plasm.view

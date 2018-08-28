@@ -1,6 +1,6 @@
 using LARVIEW
 using PyCall
-@pyimport larlib as p
+@pyimport LinearAlgebraicRepresentation as p
 
 geom_0 = hcat([[x] for x=0.:10]...)
 topol_0 = [[i,i+1] for i=1:9]

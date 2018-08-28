@@ -1,12 +1,12 @@
 using DataStructures
 using PyCall
 @pyimport pyplasm as p
-using LARLIB
+using LinearAlgebraicRepresentation
 using LARVIEW
 import Base.cat
 
 
-L = LARLIB
+L = LinearAlgebraicRepresentation
 
 View = Plasm.view
 	

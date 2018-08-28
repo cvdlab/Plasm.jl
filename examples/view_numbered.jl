@@ -1,4 +1,4 @@
-using LARLIB
+using LinearAlgebraicRepresentation
 using LARVIEW
 View = Plasm.view
 
