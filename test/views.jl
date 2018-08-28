@@ -1,4 +1,4 @@
-#using Plasm
+using Plasm
 using LinearAlgebraicRepresentation
 using Test
 using PyCall
