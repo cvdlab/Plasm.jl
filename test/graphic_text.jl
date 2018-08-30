@@ -1,9 +1,8 @@
 using Plasm
 using LinearAlgebraicRepresentation
-using Test
-using DataStructures
 using PyCall
 p = PyCall.pyimport("pyplasm")
+p_VIEW = p["VIEW"]
 p_STRUCT = p["STRUCT"]
 p_MKPOL = p["MKPOL"]
 
@@ -37,8 +36,6 @@ p_MKPOL = p["MKPOL"]
 		@test Plasm.aa(sum)([[1,2],[3,4],[5,6],[7,8]])==[3,7,11,15]
    end
 end
-
-ascii_LAR = DataStructures.OrderedDict{Int,LinearAlgebraicRepresentation.LAR}()
 
 @testset "ascii codes Tests" begin
 	@test Plasm.ascii_LAR[32] == ([0.0, 0.0], Array{Int64,1}[[1]])
