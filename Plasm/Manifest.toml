@@ -111,9 +111,7 @@ uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[Plasm]]
 deps = ["LinearAlgebraicRepresentation", "PyCall", "Test", "Triangle"]
-git-tree-sha1 = "efc3ea36bdee89ebd0a35f98f182db091ebbc867"
-repo-rev = "master"
-repo-url = "https://github.com/apaoluzzi/Plasm.jl"
+path = "/Users/paoluzzi/Documents/dev/Plasm.jl"
 uuid = "4acbb178-e000-561d-911b-0cfe9f4a6092"
 version = "0.0.0"
 
@@ -127,9 +125,11 @@ uuid = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
 
 [[PyCall]]
 deps = ["Compat", "Conda", "MacroTools", "Statistics", "VersionParsing"]
-git-tree-sha1 = "993d80a2cfd0fc4b2acc698370a4f9761b27cd9e"
+git-tree-sha1 = "db5df6f1c43547c89b69be32ef931028b3ba791b"
+repo-rev = "master"
+repo-url = "https://github.com/JuliaPy/PyCall.jl"
 uuid = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
-version = "1.18.2"
+version = "1.18.2+"
 
 [[REPL]]
 deps = ["InteractiveUtils", "Markdown", "Sockets"]
@@ -171,10 +171,12 @@ deps = ["Distributed", "InteractiveUtils", "Logging", "Random"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[Triangle]]
-deps = ["BinDeps", "InteractiveUtils", "Libdl", "Pkg", "Test"]
-git-tree-sha1 = "6c6951ef38556183da476eb3dbd5f8a8c30c4350"
+deps = ["BinDeps", "Libdl", "Test"]
+git-tree-sha1 = "8fd3b4dd77bba7004e4d4209a21d25ab5ed655f3"
+repo-rev = "master"
+repo-url = "https://github.com/cvdlab/Triangle.jl"
 uuid = "56f361f5-126b-55db-87fb-1c71988fcde4"
-version = "0.2.0"
+version = "0.2.0+"
 
 [[URIParser]]
 deps = ["Test", "Unicode"]
