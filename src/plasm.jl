@@ -13,7 +13,7 @@ module Plasm
 		Points = Matrix
 		
 	Alias declation of LAR-specific data structure.
-	Dense `Matrix` ``M\times N`` to store the position of *vertices* (0-cells)
+	Dense `Matrix` ``M times N`` to store the position of *vertices* (0-cells)
 	of a *cellular complex*. The number of rows ``M`` is the dimension 
 	of the embedding space. The number of columns ``N`` is the number of vertices.
 	"""
@@ -54,7 +54,7 @@ module Plasm
 	representation of an operator between linear spaces of `P-chains`. 
 	Operators ``P-Boundary : P-Chain -> (P-1)-Chain``
 	and ``P-Coboundary : P-Chain -> (P+1)-Chain`` are typically stored as 
-	`ChainOp` with elements in ``\{-1,0,1\}`` or in ``\{0,1\}``, for 
+	`ChainOp` with elements in `` {-1,0,1 }`` or in `` {0,1 }``, for 
 	*signed* and *unsigned* operators, respectively.
 	"""
 	const ChainOp = SparseMatrixCSC{Int8,Int}
@@ -67,7 +67,7 @@ module Plasm
 	1-dimensional `Array` of `ChainOp` that provides storage for either the 
 	*chain of boundaries* (from `D` to `0`) or the transposed *chain of coboundaries* 
 	(from `0` to `D`), with `D` the dimension of the embedding space, which may be either 
-	``\R^2`` or ``\R^3``.
+	`` R^2`` or `` R^3``.
 	"""
 	const ChainComplex = Array{ChainOp,1}
 	
