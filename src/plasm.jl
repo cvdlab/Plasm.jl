@@ -7,7 +7,7 @@ module Plasm
 	using SparseArrays
 	using DataStructures
 	
-	@pyimport pyplasm as p
+	p = PyCall.pyimport("pyplasm")
 	
 	import Base.view
 
