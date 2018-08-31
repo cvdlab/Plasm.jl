@@ -1,12 +1,16 @@
-using LinearAlgebraicRepresentation
 using Plasm
-using Test
+using PyCall
+
+p = PyCall.pyimport("pyplasm")
+p_VIEW = p["VIEW"]
+p_STRUCT = p["STRUCT"]
+p_MKPOL = p["MKPOL"]
 
 @testset "mini-FL Tests" begin
    @testset "comp" begin
-		@test Plasm.comp([acos,atan,tan,sin])(pi/4) * 4 - pi < 0.1e-14
-		@test Plasm.comp([acos,atan,tan,sin])(1)==(acos∘atan∘tan∘sin)(1)
-		@test Plasm.comp([atan,tan])(pi/4)*4 > 3.14159265358979
+		@test  Plasm.comp([acos,atan,tan,sin])(pi/4) * 4 - pi < 0.1e-14
+		@test  Plasm.comp([acos,atan,tan,sin])(1)==(acos∘atan∘tan∘sin)(1)
+		@test  Plasm.comp([atan,tan])(pi/4)*4 > 3.14159265358979
    end
    
    @testset "cons Tests" begin

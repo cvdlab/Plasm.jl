@@ -1,6 +1,7 @@
 using LinearAlgebraicRepresentation
-using LARVIEW
-View = LARVIEW.view
+using Plasm
+View = Plasm.view
+
 
 V = [9. 13 15 17 14 13 11 9 7 5 3 0 2 2 5 7 4 12 6 8 3 5 7 8 10 11 10 13 14 13 11 9 7 4 2 12 12; 0 2 4 8 9 10 11 10 9 9 8 6 3 1 0 1 2 10 3 3 5 5 6 5 5 4 2 4 6 7 9 7 7 7 6 7 5]
 
@@ -12,6 +13,6 @@ VV = [[k] for k=1:size(V,2)]
 
 model = (V, (VV,EV,FV))
 
-View(LARVIEW.numbering(2.)(model))
+View(Plasm.numbering(2.)(model))
 
-View(LARVIEW.hpc_exploded( model )(1.5,1.5,1.5))
+View(Plasm.hpc_exploded( model )(1.5,1.5,1.5))

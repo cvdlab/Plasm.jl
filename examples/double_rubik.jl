@@ -3,7 +3,7 @@
 
 using Plasm
 using PyCall
-@pyimport LinearAlgebraicRepresentation as p
+p = PyCall.pyimport("pyplasm")
 
 
 #####

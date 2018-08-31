@@ -2,7 +2,7 @@
 
 ## Dependencies
 
-`LARVIEW.jl` has one Julia dependency and one Python dependency:
+`Plasm.jl` has one Julia dependency and one Python dependency:
 
 - [LinearAlgebraicRepresentation](https://github.com/cvdlab/LinearAlgebraicRepresentation.jl)
 - [Pyplasm](https://github.com/plasm-language/pyplasm)

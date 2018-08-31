@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Visualization of geometric and/or topological data is a must for a project that concerns geometric modeling, numerical simulations, and/or graphics rendering of simulation results. The `LARVIEW.jl` package provides visualization services to `LinearAlgebraicRepresentation.jl`, the julia ongoing implementation of the *LAR (Linear Algebraic Representation)* scheme for solid and geometric modeling, well-based on linear algebra and algebraic concepts of *cellular* and *chain complexes*.  
+Visualization of geometric and/or topological data is a must for a project that concerns geometric modeling, numerical simulations, and/or graphics rendering of simulation results. The `Plasm.jl` package provides visualization services to `LinearAlgebraicRepresentation.jl`, the julia ongoing implementation of the *LAR (Linear Algebraic Representation)* scheme for solid and geometric modeling, well-based on linear algebra and algebraic concepts of *cellular* and *chain complexes*.  
 
 `LinearAlgebraicRepresentation` is implemented using only *dense* and *sparse arrays*, and without need of fancy complicated data structures that are usual for *non-manifold solid modeling*. LAR has a large semantic coverage,  including geometric and topological modeling, domain modeling for physical simulations, geographical mapping, computer graphics, computer vision and robotics.
 

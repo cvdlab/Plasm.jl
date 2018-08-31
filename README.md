@@ -1,15 +1,15 @@
-# LARVIEW.jl
+# Plasm.jl
 
 Graphics module to visualize LinearAlgebraicRepresentation.jl structures via PyPLaSM.
 
 ### Version
-0.3.0
+0.1.0
 
 ## Installing
 
 Follow the simple README instructions, depending on your Python installation, to install `pyplasm` from [https://github.com/plasm-language/pyplasm](https://github.com/plasm-language/pyplasm) repo.
 
-Just run `Pkg.clone("https://github.com/cvdlab/LARVIEW.jl")` within a Julia console.
+Just run `Pkg.clone("https://github.com/cvdlab/Plasm.jl")` within a Julia console.
 
 ## API
 

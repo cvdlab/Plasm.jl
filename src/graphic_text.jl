@@ -1,8 +1,13 @@
 using DataStructures
+
 using PyCall
-p = PyCall.pyimport("pyplasm")
+p_VIEW = p["VIEW"]
+p_STRUCT = p["STRUCT"]
+p_MKPOL = p["MKPOL"]
+
 using LinearAlgebraicRepresentation
 using Plasm
+
 import Base.cat
 
 
@@ -47,7 +52,7 @@ function comp(funs)
 	  return x -> f(g(x))
 	end
     id = x->x
-    return reduce(compose,id,funs)
+    return reduce(compose, funs; init=id)
 end
 
 
@@ -313,7 +318,9 @@ hpcs = [
 
 
 """
-	ascii_LAR::DataStructures.OrderedDict
+ascii_LAR = DataStructures.OrderedDict{Int,LinearAlgebraicRepresentation.LAR}()
+
+	ascii_LAR::{Int,LinearAlgebraicRepresentation.LAR}
 
 *Ordered dictionary* of printable ASCII codes as one-dimensional *LAR models* in 2D.
 
@@ -460,7 +467,7 @@ end
 Redefined locally, as service to `textWithAttributes` implementation.
 """
 function cat(args)
-	return reduce( (x,y) -> append!(x,y), [], args )
+	return reduce( (x,y) -> append!(x,y), args; init=[] )
 end
 
 

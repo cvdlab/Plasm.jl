@@ -11,24 +11,24 @@ end
 
 
 	function larView(model::Tuple{Array{Float64, 2}, Array{Array{Int64, 1}, 1}})
-		p.VIEW(LARVIEW.lar2hpc(model...))
+		p.VIEW(Plasm.lar2hpc(model...))
 	end
 	function larView(model::Tuple{Array{Array{Float64,N} where 
 	N,1},Array{Array{Int64,1},1}})
 		V,CV = model
 		V = hcat(V...)
-		p.VIEW(LARVIEW.lar2hpc(V,CV))
+		p.VIEW(Plasm.lar2hpc(V,CV))
 	end
 	function larView(model::Array{Any,1})
-		HPC_value_array = [LARVIEW.lar2hpc(item[1],item[2]) for item in model]
+		HPC_value_array = [Plasm.lar2hpc(item[1],item[2]) for item in model]
 		p.VIEW(p.STRUCT(HPC_value_array))
 	end
 	function larView(V::Array{Float64, 2}, CV::Array{Array{Int64, 1}, 1})
-		p.VIEW(LARVIEW.lar2hpc(V, CV))
+		p.VIEW(Plasm.lar2hpc(V, CV))
 	end
 	function larView(V::Array{Int64, 2}, CV::Array{Array{Int64, 1}, 1})
 		W = convert(Array{Float64,2}, V)
-		p.VIEW(LARVIEW.lar2hpc(W, CV))
+		p.VIEW(Plasm.lar2hpc(W, CV))
 	end
 
 
@@ -41,13 +41,13 @@ end
 		Z = hcat(V[:,1],V)
 		W = PyCall.PyObject([Any[Z[h,k] for h=1:size(Z,1)] for k=1:size(Z,2)])
 
-		VV,EV,FV,CV = map(LARVIEW.doublefirst, [VV+1,EV+1,FV+1,CV+1])
-		WW,EW,FW,CW = map(LARVIEW.array2list,[VV,EV,FV,CV])
+		VV,EV,FV,CV = map(Plasm.doublefirst, [VV+1,EV+1,FV+1,CV+1])
+		WW,EW,FW,CW = map(Plasm.array2list,[VV,EV,FV,CV])
 		PyCall.PyObject([WW,EW,FW,CW])
 		wire = p.MKPOL(PyCall.PyObject([W,EW,[]]))
 
 		VV,EV,FV,CV = VV-1,EV-1,FV-1,CV-1
-		WW,EW,FW,CW = map(LARVIEW.array2list,[VV,EV,FV,CV])
+		WW,EW,FW,CW = map(Plasm.array2list,[VV,EV,FV,CV])
 		hpc = p.larModelNumbering(1,1,1)(W,PyCall.PyObject([WW,EW,FW,CW]),wire,scaling)
 	end
 
@@ -118,7 +118,7 @@ end
 				scaledcentroid = scaling.*centroid
 				translation = scaledcentroid - centroid
 				w = v .+ translation
-				hpc = p.SOLIDIFY(LARVIEW.lar2hpc(w,tv))
+				hpc = p.SOLIDIFY(Plasm.lar2hpc(w,tv))
 				append!(hpcs, [hpc])
 			end
 			p.VIEW(p.STRUCT(hpcs))
