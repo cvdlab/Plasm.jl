@@ -1,7 +1,7 @@
 #addprocs(Sys.CPU_CORES)
-#@everywhere using LARVIEW
+#@everywhere using Plasm
 
-using LARVIEW
+using Plasm
 using PyCall
 @pyimport LinearAlgebraicRepresentation as p
 
@@ -11,17 +11,17 @@ using PyCall
 ncubes = 3
 V,cells = LinearAlgebraicRepresentation.larCuboids([ncubes,ncubes,ncubes],true)
 VV,EV,FV,CV = cells
-LARVIEW.viewexploded(V,FV);
+Plasm.viewexploded(V,FV);
 
 t = -ncubes/2
-V = LARVIEW.translate([t,t,t],V)
-LARVIEW.viewexploded(V,FV);
+V = Plasm.translate([t,t,t],V)
+Plasm.viewexploded(V,FV);
 
 W = copy(V)
 FW = copy(FV)
 
-W = LARVIEW.rotate((0,π/3,0),LARVIEW.rotate((π/3,0,0), W))
-LARVIEW.viewexploded(W,FW);
+W = Plasm.rotate((0,π/3,0),Plasm.rotate((π/3,0,0), W))
+Plasm.viewexploded(W,FW);
 
 
 V,W = V',W'
@@ -37,15 +37,15 @@ V,cscEV,cscFE,cscCF = arranged_rubiks
 
 ne,nv = size(cscEV)
 EV = [findn(cscEV[e,:]) for e=1:ne]
-LARVIEW.viewexploded(V',EV)
+Plasm.viewexploded(V',EV)
 
 nf = size(cscFE,1)
 FV = [collect(Set(vcat([EV[e] for e in findn(cscFE[f,:])]...)))  for f=1:nf]
-LARVIEW.viewexploded(V',FV)
+Plasm.viewexploded(V',FV)
 
 nc = size(cscCF,1)
 CV = [collect(Set(vcat([FV[f] for f in findn(cscCF[c,:])]...)))  for c=2:nc]
-LARVIEW.viewexploded(V',CV)
+Plasm.viewexploded(V',CV)
 
 ######
 
@@ -53,9 +53,9 @@ V,(VV,EV,FV,CV) = LinearAlgebraicRepresentation.larCuboids([2,2,1],true)
 V,bases,coboundaries = LinearAlgebraicRepresentation.chaincomplex(V,FV,EV)
 EV,FV,CV = bases
 cscEV,cscFE,cscCF = coboundaries
-LARVIEW.viewexploded(V,EV)
-LARVIEW.viewexploded(V,FV)
-LARVIEW.viewexploded(V,CV)
+Plasm.viewexploded(V,EV)
+Plasm.viewexploded(V,FV)
+Plasm.viewexploded(V,CV)
 (ne,nv),nf,nc = size(cscEV),size(cscFE,1),size(cscCF,1)
 nv-ne+nf-nc
 
@@ -72,16 +72,16 @@ V,FV,EV = LinearAlgebraicRepresentation.collection2model(collection)
 V,bases,coboundaries = LinearAlgebraicRepresentation.chaincomplex(V,FV,EV)
 EV,FV,CV = bases
 cscEV,cscFE,cscCF = coboundaries
-LARVIEW.viewexploded(V,EV)
-LARVIEW.viewexploded(V,FV)
-LARVIEW.viewexploded(V,CV)
+Plasm.viewexploded(V,EV)
+Plasm.viewexploded(V,FV)
+Plasm.viewexploded(V,CV)
 
 ####
 
 TV = LinearAlgebraicRepresentation.triangulate((1:length(FV),ones(length(FV))),V,FV,EV,cscFE,cscCF)
-LARVIEW.viewexploded(V,TV)
+Plasm.viewexploded(V,TV)
 
 
 ########
 
-LARVIEW.viewsolidcells(1.5,1.5,3.)(V,CV,FV,EV,cscCF,cscFE)
+Plasm.viewsolidcells(1.5,1.5,3.)(V,CV,FV,EV,cscCF,cscFE)

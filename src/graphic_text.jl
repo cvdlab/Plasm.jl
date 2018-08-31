@@ -1,14 +1,14 @@
 using DataStructures
 using PyCall
-@pyimport pyplasm as p
+p = PyCall.pyimport("pyplasm")
 using LinearAlgebraicRepresentation
-using LARVIEW
+using Plasm
 import Base.cat
 
 
 L = LinearAlgebraicRepresentation
 
-View = LARVIEW.view
+View = Plasm.view
 	
 
 """ 
@@ -22,7 +22,7 @@ Apply the `affineMatrix` parameter to the vertices of `larmodel`.
 julia> square = LinearAlgebraicRepresentation.cuboid([1,1])
 ([0.0 0.0 1.0 1.0; 0.0 1.0 0.0 1.0], Array{Int64,1}[[1, 2, 3, 4]])
 
-julia> LARVIEW.apply(LinearAlgebraicRepresentation.t(1,2))(square)
+julia> Plasm.apply(LinearAlgebraicRepresentation.t(1,2))(square)
 ([1.0 1.0 2.0 2.0; 2.0 3.0 2.0 3.0], Array{Int64,1}[[1, 2, 3, 4]])
 ```
 """
@@ -63,7 +63,7 @@ applications of component functions to actual parameter.
 # Example 
 
 ```
-julia> LARVIEW.cons([cos,sin])(0)
+julia> Plasm.cons([cos,sin])(0)
 2-element Array{Float64,1}:
  1.0
  0.0
@@ -86,10 +86,10 @@ when applied to another parameter.
 #	Examples
 
 ```
-julia> LARVIEW.k(10)(100)
+julia> Plasm.k(10)(100)
 10
 
-julia> LARVIEW.k(sin)(cos)
+julia> Plasm.k(sin)(cos)
 sin
 ```
 """
@@ -106,7 +106,7 @@ AA applies fun to each element of the args sequence
 # Example 
 
 ```
-julia> LARVIEW.aa(sqrt)([1,4,9,16])
+julia> Plasm.aa(sqrt)([1,4,9,16])
 4-element Array{Float64,1}:
  1.0
  2.0
@@ -143,13 +143,13 @@ Return the `pair` array with the elements of `args` coupled with `x`
 # Example 
 
 ```
-julia> LARVIEW.distr(([1,2,3],10))
+julia> Plasm.distr(([1,2,3],10))
 3-element Array{Array{Int64,1},1}:
  [1, 10]
  [2, 10]
  [3, 10]
 
-julia> LARVIEW.distr([[1,2,3],10])
+julia> Plasm.distr([[1,2,3],10])
 3-element Array{Array{Int64,1},1}:
  [1, 10]
  [2, 10]
@@ -173,13 +173,13 @@ Return the `pair` array with `x` coupled with the elements of `args`.
 # Example 
 
 ```
-julia> LARVIEW.distl((10, [1,2,3]))
+julia> Plasm.distl((10, [1,2,3]))
 3-element Array{Array{Int64,1},1}:
  [10, 1]
  [10, 2]
  [10, 3]
 
-julia> LARVIEW.distl([10, [1,2,3]])
+julia> Plasm.distl([10, [1,2,3]])
 3-element Array{Array{Int64,1},1}:
  [10, 1]
  [10, 2]
@@ -322,14 +322,14 @@ Font design: *Geometric Programming for Computer-Aided Design*, Wiley, 2003.
 
 # Example
 ```
-julia> LARVIEW.ascii_LAR[46]
+julia> Plasm.ascii_LAR[46]
 ([2.0 2.0 … 1.5 2.0; 0.0 0.5 … 0.0 0.0], Array{Int64,1}[[1, 2], [2, 3], [3, 4], [4, 5]])
 
-julia> LARVIEW.ascii_LAR[126]
+julia> Plasm.ascii_LAR[126]
 ([1.0 1.75 2.75 3.5; 5.0 5.5 5.0 5.5], Array{Int64,1}[[1, 2], [2, 3], [3, 4]])
 ```
 """
-ascii_LAR = OrderedDict(zip(32:126,LARVIEW.hpcs))
+ascii_LAR = OrderedDict(zip(32:126,Plasm.hpcs))
 
 
 
@@ -362,7 +362,7 @@ end
 
 # Example
 ```
-julia> LARVIEW.charseq("PLaSM")
+julia> Plasm.charseq("PLaSM")
 5-element Array{Char,1}:
  'P'
  'L'
@@ -383,7 +383,7 @@ Compute the one-dim *LAR model* drawing the contents of `mystring`
 
 # Example
 ```
-julia> model = LARVIEW.text("PLaSM")
+julia> model = Plasm.text("PLaSM")
 # output 
 ([0.0 0.0 3.0 4.0 4.0 3.0 0.0 9.0 5.0 5.0 14.0 13.0 11.0 10.0 
 10.0 11.0 13.0 14.0 14.0 14.0 15.0 16.0 18.0 19.0 19.0 18.0 16.0 15.0 15.0 16.0 18.0 
@@ -394,7 +394,7 @@ Array{Int64,1}[[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[8,9],[9,10],[11,12],[12,13],
 [14,15],[15,16],[16,17],[17,18],[18,11],[19,20],[21,22],[22,23],[23,24],[24,25],[25,26],
 [26,27],[27,28],[28,29],[29,30],[30,31],[31,32],[33,34],[34,35],[35,36],[36,37]])
 
-julia> LARVIEW.view(model)
+julia> Plasm.view(model)
 ```
 """
 function text(mystring)
@@ -475,7 +475,7 @@ Partial implementation of the GKS's graphics primitive `text`.
 # Example
 
 ``` 
-LARVIEW.view(LARVIEW.textWithAttributes("left", pi/4)("PLaSM"))
+Plasm.view(Plasm.textWithAttributes("left", pi/4)("PLaSM"))
 ```
 """
 function textWithAttributes(textalignment="centre", textangle=0, 
@@ -531,33 +531,33 @@ Different `colors` and size are used for the various dimensional cells.
 
 ```
 model = LinearAlgebraicRepresentation.cuboidGrid([3,4,2], true)
-LARVIEW.view(LARVIEW.numbering()(model)) 
+Plasm.view(Plasm.numbering()(model)) 
 
 model = LinearAlgebraicRepresentation.cuboidGrid([10,10], true)
-LARVIEW.view(LARVIEW.numbering(1.5)(model))
+Plasm.view(Plasm.numbering(1.5)(model))
 ```
 """ 
 function numbering(numberSizeScaling=1) 
 	function numbering0(model) 
 		V,cells = model
 		if size(V,1)==2 
-			V = LARVIEW.embed(1)(model)[1]
+			V = Plasm.embed(1)(model)[1]
 		end
-		wireframe = LARVIEW.lar2hpc(V,cells[2])
+		wireframe = Plasm.lar2hpc(V,cells[2])
 		ns = numberSizeScaling
-		gcode = LARVIEW.textWithAttributes("centre", 0, 0.1ns, 0.2ns, 0.025ns)
+		gcode = Plasm.textWithAttributes("centre", 0, 0.1ns, 0.2ns, 0.025ns)
 		scene = [wireframe]
 		for (h,skel) in enumerate(cells)
 			colors = [p.GREEN,p.YELLOW,p.CYAN,p.ORANGE]
 			nums = []
 			for (k,cell) in enumerate(skel)
 				center = sum([V[:,v] for v in cell])/length(cell)
-				code = LARVIEW.embed(1)( gcode(string(k)) )
+				code = Plasm.embed(1)( gcode(string(k)) )
 				scaling = (0.6+0.1h,0.6+0.1h,1)
 				push!(nums, LinearAlgebraicRepresentation.struct2lar( LinearAlgebraicRepresentation.Struct([ 
 					LinearAlgebraicRepresentation.t(center...), LinearAlgebraicRepresentation.s(scaling...), code ]) ))
 			end
-			hpc = LARVIEW.lar2hpc(nums)
+			hpc = Plasm.lar2hpc(nums)
 			push!( scene, p.COLOR(colors[h])(hpc) )
 		end
 		p.STRUCT( scene )

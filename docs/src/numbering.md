@@ -6,7 +6,7 @@ The used vector font, originally designed and implemented in PLaSM language (a g
 as a LAR model, and providing primitives to translate every textual string into one or more such data structures. For example, the "PLaSM" string is transformed into the 1D complex 
 
 ```julia
-julia> LARVIEW.text("PLaSM")
+julia> Plasm.text("PLaSM")
 # output
 ([0.0 0.0 3.0 4.0 4.0 3.0 0.0 9.0 5.0 5.0 14.0 13.0 11.0 10.0 10.0 
 11.0 13.0 14.0 14.0 14.0 15.0 16.0 18.0 19.0 19.0 18.0 16.0 15.0 15.0 16.0 18.0 19.0 
@@ -31,7 +31,7 @@ The geometry of 2D faces can be computed -- as a minimal basis of *cycles* (chai
 
 ## Numbering cellular complexes
 
-To get a proper view of data types used by `LARVIEW` and `LinearAlgebraicRepresentation` packages, look at the
+To get a proper view of data types used by `Plasm` and `LinearAlgebraicRepresentation` packages, look at the
 [Glossary](glossary.md) document.
 
 
@@ -50,5 +50,5 @@ Another set of methods will be dedicated to *display cell indices* of various ce
 ## Main Interface
 
 ```@docs
-LARVIEW.numbering
+Plasm.numbering
 ```

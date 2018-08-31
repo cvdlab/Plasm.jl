@@ -1,9 +1,0 @@
-using LinearAlgebraicRepresentation
-using LARVIEW
-using PyCall
-@pyimport LinearAlgebraicRepresentation as p
-include("../src/utilities.jl")
-
-V,(VV,EV,FV,CV) = LinearAlgebraicRepresentation.larCuboids([3,2,1],true)
-larmodel = V,(VV,EV,FV)
-LARVIEW.viewnumbered(larmodel)

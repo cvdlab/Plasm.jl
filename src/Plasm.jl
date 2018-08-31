@@ -1,4 +1,4 @@
-module LARVIEW
+module Plasm
 
 	#export centroid, cuboidGrid, mkpol, view, hpc_exploded, lar2hpc
 
@@ -13,7 +13,7 @@ module LARVIEW
 		Points = Matrix
 		
 	Alias declation of LAR-specific data structure.
-	Dense `Matrix` ``M\times N`` to store the position of *vertices* (0-cells)
+	Dense `Matrix` ``M times N`` to store the position of *vertices* (0-cells)
 	of a *cellular complex*. The number of rows ``M`` is the dimension 
 	of the embedding space. The number of columns ``N`` is the number of vertices.
 	"""
@@ -54,7 +54,7 @@ module LARVIEW
 	representation of an operator between linear spaces of `P-chains`. 
 	Operators ``P-Boundary : P-Chain -> (P-1)-Chain``
 	and ``P-Coboundary : P-Chain -> (P+1)-Chain`` are typically stored as 
-	`ChainOp` with elements in ``\{-1,0,1\}`` or in ``\{0,1\}``, for 
+	`ChainOp` with elements in `` {-1,0,1 }`` or in `` {0,1 }``, for 
 	*signed* and *unsigned* operators, respectively.
 	"""
 	const ChainOp = SparseMatrixCSC{Int8,Int}
@@ -67,7 +67,7 @@ module LARVIEW
 	1-dimensional `Array` of `ChainOp` that provides storage for either the 
 	*chain of boundaries* (from `D` to `0`) or the transposed *chain of coboundaries* 
 	(from `0` to `D`), with `D` the dimension of the embedding space, which may be either 
-	``\R^2`` or ``\R^3``.
+	`` R^2`` or `` R^3``.
 	"""
 	const ChainComplex = Array{ChainOp,1}
 	
@@ -162,7 +162,7 @@ module LARVIEW
 	 [1, 3, 5, 7]
 	 [2, 4, 6, 8]
 
-	julia> LARVIEW.cells2py(FV)
+	julia> Plasm.cells2py(FV)
 	PyObject [[1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 5, 6], [3, 4, 7, 8], 
 	[1, 3, 5, 7], [2, 4, 6, 8]]
 	```
@@ -187,7 +187,7 @@ module LARVIEW
 	 0.0  0.0  1.0  1.0  0.0  0.0  1.0  1.0
 	 0.0  1.0  0.0  1.0  0.0  1.0  0.0  1.0
 
-	julia> LARVIEW.points2py(V)
+	julia> Plasm.points2py(V)
 	PyObject [[0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [0.0, 1.0, 0.0], [0.0, 1.0, 1.0], 
 	[1.0, 0.0, 0.0], [1.0, 0.0, 1.0], [1.0, 1.0, 0.0], [1.0, 1.0, 1.0]]
 	```
@@ -212,11 +212,11 @@ module LARVIEW
 	```julia
 	julia> V,(VV,EV,FV,CV) = LinearAlgebraicRepresentation.cuboid([1,1,1],true);
 	
-	julia> LARVIEW.mkpol(V,EV)
+	julia> Plasm.mkpol(V,EV)
 	PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 
 	'std::shared_ptr< Hpc > *' at 0x12cf45d50> >
 
-	julia> LARVIEW.view(LARVIEW.mkpol(V,EV))	
+	julia> Plasm.view(Plasm.mkpol(V,EV))	
 	[...]
 	```
 	"""
@@ -245,11 +245,11 @@ module LARVIEW
 	6], [7, 8], [8, 9], [1, 4], [2, 5], [3, 6], [4, 7], [5, 8], [6, 9]], 
 	Array{Int64,1}[[1, 2, 4, 5], [2, 3, 5, 6], [4, 5, 7, 8], [5, 6, 8, 9]]])
 
-	julia> hpc = LARVIEW.mkpol(m[1],m[2][2])
+	julia> hpc = Plasm.mkpol(m[1],m[2][2])
 	PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 'std::shared_ptr< Hpc > *' 
 	at 0x140d6c780> >
 
-	julia> LARVIEW.view(hpc)
+	julia> Plasm.view(hpc)
 	``` 
 	"""
 	function view(hpc::Hpc)
@@ -272,12 +272,12 @@ module LARVIEW
 	```julia
 	julia> V,(VV,EV,FV,CV) = LinearAlgebraicRepresentation.cuboid([1,1,1],true);
 	
-	julia> LARVIEW.mkpol(V,CV)
+	julia> Plasm.mkpol(V,CV)
 	PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 
 	'std::shared_ptr< Hpc > *' at 0x12cf45d50> >
 
 	julia> 
-	LARVIEW.view(LARVIEW.mkpol(V,CV))	
+	Plasm.view(Plasm.mkpol(V,CV))	
 	[...]
 	```
 	"""
@@ -304,7 +304,7 @@ module LARVIEW
 	
 	julia> V,(VV,EV,FV,CV) = LinearAlgebraicRepresentation.cuboid([.5,.5,.5], true);
 	
-	julia> LARVIEW.view( (V,[VV,EV,FV,CV]) )
+	julia> Plasm.view( (V,[VV,EV,FV,CV]) )
 	```
 	"""
 	function view(model::LARmodel)
@@ -330,7 +330,7 @@ module LARVIEW
 		
 	julia> V,(VV,EV,FV,CV) = LinearAlgebraicRepresentation.cuboid([1,1,1], true);
 		
-	julia> LARVIEW.view( (V,FV) );
+	julia> Plasm.view( (V,FV) );
 	```
 	"""
 	function view(pair::Tuple{Points,Cells})
@@ -354,7 +354,7 @@ module LARVIEW
 	tablelegs = LinearAlgebraicRepresentation.Struct( repeat([ tableLeg, LinearAlgebraicRepresentation.r(0,0,pi/2) ],outer=4) );
 	table = LinearAlgebraicRepresentation.Struct([ tableTop, tablelegs ]);
 	
-	LARVIEW.view(table)
+	Plasm.view(table)
 	```
 	"""
 	function view(obj::LinearAlgebraicRepresentation.Struct)
@@ -388,12 +388,12 @@ module LARVIEW
 	# output
 	# 5-element Array{Any,1}
 	
-	LARVIEW.view(scene)
+	Plasm.view(scene)
 	```
 	"""
 	function view(scene::Array{Any,1})
 		if prod([isa(item[1:2],LinearAlgebraicRepresentation.LAR) for item in scene])
-			p.VIEW(p.STRUCT([LARVIEW.lar2hpc(item[1],item[2]) for item in scene]))
+			p.VIEW(p.STRUCT([Plasm.lar2hpc(item[1],item[2]) for item in scene]))
 		end
 	end
 
@@ -408,7 +408,7 @@ module LARVIEW
 	
 	# Example
 	```julia
-	julia> hpc = LARVIEW.hpc_exploded(LinearAlgebraicRepresentation.cuboidGrid([3,2,1], true))(1.5,1.5,1.5)
+	julia> hpc = Plasm.hpc_exploded(LinearAlgebraicRepresentation.cuboidGrid([3,2,1], true))(1.5,1.5,1.5)
 	
 	julia> view(hpc)
 	```
@@ -427,8 +427,8 @@ module LARVIEW
 					translation_vector = scaled_center-center
 					vcell = vcell .+ translation_vector
 		
-					py_verts = LARVIEW.points2py(vcell)
-					py_cells = LARVIEW.cells2py( [collect(1:size(vcell,2))] )
+					py_verts = Plasm.points2py(vcell)
+					py_cells = Plasm.cells2py( [collect(1:size(vcell,2))] )
 					
 					hpc = p.MKPOL([ py_verts, py_cells, [] ])
 					push!(out, hpc)
@@ -487,9 +487,9 @@ module LARVIEW
 	```julia
 	julia> model = LinearAlgebraicRepresentation.cuboid([1,1,1],true);
 	
-	julia> view( LARVIEW.lar2hpc(model) )
+	julia> view( Plasm.lar2hpc(model) )
 	
-	julia> view( LARVIEW.hpc_exploded(model)(1.5,1.5,1.5) )
+	julia> view( Plasm.hpc_exploded(model)(1.5,1.5,1.5) )
 	```
 	"""
 	function lar2hpc(model::LARmodel)::Hpc
@@ -520,7 +520,7 @@ module LARVIEW
 	structo2 = LinearAlgebraicRepresentation.Struct(repeat([structo1,LinearAlgebraicRepresentation.t(3,0)],outer = 10));
 	scene = LinearAlgebraicRepresentation.evalStruct(structo2);
 	
-	LARVIEW.view(LARVIEW.lar2hpc(scene))
+	Plasm.view(Plasm.lar2hpc(scene))
 	```
 
 	"""
@@ -547,22 +547,22 @@ module LARVIEW
 	```
 	julia> V,cells = LinearAlgebraicRepresentation.cuboidGrid([3,3,1], true)
 	
-	julia> hpc = LARVIEW.lar2exploded_hpc(V::LinearAlgebraicRepresentation.Points, cells[4]::LinearAlgebraicRepresentation.Cells)()
+	julia> hpc = Plasm.lar2exploded_hpc(V::LinearAlgebraicRepresentation.Points, cells[4]::LinearAlgebraicRepresentation.Cells)()
 
-	julia> LARVIEW.view(hpc)
+	julia> Plasm.view(hpc)
 	```
 	"""
 	function lar2exploded_hpc(V::LinearAlgebraicRepresentation.Points, cells::LinearAlgebraicRepresentation.Cells)
 		function lar2exploded_hpc0(sx=1.2, sy=1.2, sz=1.2)
-			hpc = LARVIEW.hpc_exploded( (V,[cells]) )(sx,sy,sz)
+			hpc = Plasm.hpc_exploded( (V,[cells]) )(sx,sy,sz)
 		end
 		return lar2exploded_hpc0
 	end
 	
 	function viewexploded(V::LinearAlgebraicRepresentation.Points, cells::LinearAlgebraicRepresentation.Cells)
 		function lar2exploded_hpc0(sx=1.2, sy=1.2, sz=1.2)
-			hpc = LARVIEW.hpc_exploded( (V,[cells]) )(sx,sy,sz)
-			LARVIEW.view(hpc)
+			hpc = Plasm.hpc_exploded( (V,[cells]) )(sx,sy,sz)
+			Plasm.view(hpc)
 		end
 		return lar2exploded_hpc0
 	end

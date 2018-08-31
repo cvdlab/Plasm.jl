@@ -1,6 +1,6 @@
 # LARVIEW.jl
 
-Useful module to visualize [LinearAlgebraicRepresentation.jl](https://github.com/cvdlab/LinearAlgebraicRepresentation.jl) structures via [PyPLASM](https://github.com/plasm-language/pyplasm)
+Graphics module to visualize LinearAlgebraicRepresentation.jl structures via PyPLaSM.
 
 ### Version
 0.3.0
@@ -13,13 +13,11 @@ Just run `Pkg.clone("https://github.com/cvdlab/LARVIEW.jl")` within a Julia cons
 
 ## API
 
-Include the module (`using LARVIEW`).
+Include the module (`using Plasm`).
 
 ## Authors
 * [Giorgio Scorzelli](https://github.com/plasm-language/pyplasm)
 * [Alberto Paoluzzi](https://github.com/apaoluzzi)
-* [Francesco Furiani](https://github.com/furio)
-* [Giulio Martella](https://github.com/giuliom95)
 
 ## How to contribute
 
