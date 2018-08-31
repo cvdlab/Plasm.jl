@@ -3,7 +3,7 @@
 
 using Plasm
 using PyCall
-@pyimport pyplasm as p
+p = PyCall.pyimport("pyplasm")
 
 
 #####

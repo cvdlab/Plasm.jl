@@ -1,3 +1,4 @@
+using PyCall
 p = PyCall.pyimport("pyplasm")
 p_STRUCT = p["STRUCT"]
 p_MKPOL = p["MKPOL"]
@@ -22,10 +23,7 @@ p_MKPOL = p["MKPOL"]
 	W = [Any[V[h,k] for h=1:size(V,1)] for k=1:size(V,2)];
 	
 	@test typeof(PyObject([W,CV,[]])) == PyCall.PyObject
-#	@test typeof(p.MKPOLS(PyObject([W,CV,[]]))) == Array{PyCall.PyObject,1}
-#	@test typeof(p.STRUCT(p.MKPOLS(PyObject([W,CV,[]])))) == PyCall.PyObject
-#	@test repr(W) == "Array{Any,1}[Any[0.0, 0.0, 0.0], Any[0.0, 0.0, 0.0], Any[0.0, 0.0, 1.0], Any[0.0, 0.5, 0.0], Any[0.0, 0.5, 1.0], Any[0.0, 1.0, 0.0], Any[0.0, 1.0, 1.0], Any[1.0, 0.0, 0.0], Any[1.0, 0.0, 1.0], Any[1.0, 0.5, 0.0], Any[1.0, 0.5, 1.0], Any[1.0, 1.0, 0.0], Any[1.0, 1.0, 1.0]]"
-#	@test repr(CV) == "Array{Int64,1}[[1, 2, 3, 4, 7, 8, 9, 10], [3, 4, 5, 6, 9, 10, 11, 12]]"
-#	@test typeof(p.EXPLODE(1.2,1.2,1.2)(p.MKPOLS(PyObject([W,CV,[]])))) == PyCall.PyObject
+	@test repr(W) == "Array{Any,1}[Any[0.0, 0.0, 0.0], Any[0.0, 0.0, 0.0], Any[0.0, 0.0, 1.0], Any[0.0, 0.5, 0.0], Any[0.0, 0.5, 1.0], Any[0.0, 1.0, 0.0], Any[0.0, 1.0, 1.0], Any[1.0, 0.0, 0.0], Any[1.0, 0.0, 1.0], Any[1.0, 0.5, 0.0], Any[1.0, 0.5, 1.0], Any[1.0, 1.0, 0.0], Any[1.0, 1.0, 1.0]]"
+	@test repr(CV) == "Array{Int64,1}[[1, 2, 3, 4, 7, 8, 9, 10], [3, 4, 5, 6, 9, 10, 11, 12]]"
 end
 

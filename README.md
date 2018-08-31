@@ -1,6 +1,6 @@
 # Plasm.jl
 
-Viewer for [LinearAlgebraicRepresentation.jl](https://github.com/cvdlab/LinearAlgebraicRepresentation.jl) data via [PyPLaSM](https://github.com/plasm-language/pyplasm)
+Graphics module to visualize LinearAlgebraicRepresentation.jl structures via PyPLaSM.
 
 ### Version
 0.1.0
