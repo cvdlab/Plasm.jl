@@ -41,4 +41,4 @@ install:
 
 build_script:
   - IF EXIST .git\shallow (git fetch --unshallow)
-  - C:\projects\julia\bin\julia -e "using InteractiveUtils; InteractiveUtils.versioninfo(); using Pkg; Pkg.clone(pwd(), \"LARVIEW\"); Pkg.build(\"LARVIEW\")"
+  - C:\projects\julia\bin\julia -e "using InteractiveUtils; InteractiveUtils.versioninfo(); using Pkg; Pkg.clone(pwd(), \"Plasm\"); Pkg.build(\"Plasm\")"
