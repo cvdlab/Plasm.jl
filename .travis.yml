@@ -2,7 +2,7 @@ language: julia
 
 os:
   - linux
-  - osx
+#  - osx
 
 branches:
   only:
@@ -10,12 +10,14 @@ branches:
     - julia-1.0
   
 julia:
+  - 0.6
   - 0.7
   - 1.0
   - nightly
 
 matrix:
   allow_failures:
+    - julia: 1.0
     - julia: nightly
 
 notifications:
