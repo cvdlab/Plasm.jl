@@ -1,5 +1,3 @@
-using PyCall
-@pyimport pyplasm as p
 
 #p = PyCall.pyimport("pyplasm")
 #p_STRUCT = p["STRUCT"]
