@@ -1,15 +1,16 @@
-#addprocs(Sys.CPU_CORES)
-#@everywhere using Plasm
+using LinearAlgebraicRepresentation
+Lar = LinearAlgebraicRepresentation
 
 using Plasm
+
 using PyCall
-p = PyCall.pyimport("pyplasm")
+@pyimport pyplasm as p
 
 
 #####
 
 ncubes = 3
-V,cells = LinearAlgebraicRepresentation.larCuboids([ncubes,ncubes,ncubes],true)
+V,cells = Lar.larCuboids([ncubes,ncubes,ncubes],true)
 VV,EV,FV,CV = cells
 Plasm.viewexploded(V,FV);
 
@@ -30,8 +31,8 @@ FE = boundary2(FV,EV)
 
 rubik = [V,EW,FE]
 rot_rubik = [W,EW,FE]
-two_rubiks = LinearAlgebraicRepresentation.skel_merge(rubik..., rot_rubik...)
-arranged_rubiks = LinearAlgebraicRepresentation.spatial_arrangement(two_rubiks...,multiproc=false)
+two_rubiks = Lar.skel_merge(rubik..., rot_rubik...)
+arranged_rubiks = Lar.spatial_arrangement(two_rubiks...,multiproc=false)
 
 V,cscEV,cscFE,cscCF = arranged_rubiks
 
@@ -49,8 +50,8 @@ Plasm.viewexploded(V',CV)
 
 ######
 
-V,(VV,EV,FV,CV) = LinearAlgebraicRepresentation.larCuboids([2,2,1],true)
-V,bases,coboundaries = LinearAlgebraicRepresentation.chaincomplex(V,FV,EV)
+V,(VV,EV,FV,CV) = Lar.larCuboids([2,2,1],true)
+V,bases,coboundaries = Lar.chaincomplex(V,FV,EV)
 EV,FV,CV = bases
 cscEV,cscFE,cscCF = coboundaries
 Plasm.viewexploded(V,EV)
@@ -61,27 +62,18 @@ nv-ne+nf-nc
 
 #####
 
-V,(VV,EV,FV,CV) = LinearAlgebraicRepresentation.larCuboids([2,2,1],true)
+V,(VV,EV,FV,CV) = Lar.larCuboids([2,2,1],true)
 W,FW,EW = copy(V),copy(FV),copy(EV)
 collection = [[W,FW,EW]]
 for k=1:10
 	W,FW,EW = rotate([0,0,π/15],copy(W)+.5),copy(FV),copy(EV)
 	append!(collection, [[W,FV,EV]])
 end
-V,FV,EV = LinearAlgebraicRepresentation.collection2model(collection)
-V,bases,coboundaries = LinearAlgebraicRepresentation.chaincomplex(V,FV,EV)
+V,FV,EV = Lar.collection2model(collection)
+V,bases,coboundaries = Lar.chaincomplex(V,FV,EV)
 EV,FV,CV = bases
 cscEV,cscFE,cscCF = coboundaries
 Plasm.viewexploded(V,EV)
 Plasm.viewexploded(V,FV)
 Plasm.viewexploded(V,CV)
 
-####
-
-TV = LinearAlgebraicRepresentation.triangulate((1:length(FV),ones(length(FV))),V,FV,EV,cscFE,cscCF)
-Plasm.viewexploded(V,TV)
-
-
-########
-
-Plasm.viewsolidcells(1.5,1.5,3.)(V,CV,FV,EV,cscCF,cscFE)

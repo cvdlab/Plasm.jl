@@ -15,10 +15,13 @@ using DataStructures
 using LinearAlgebraicRepresentation
 Lar = LinearAlgebraicRepresentation
 using Plasm
-p = PyCall.pyimport("pyplasm")
-p_VIEW = p["VIEW"]
-p_STRUCT = p["STRUCT"]
-p_MKPOL = p["MKPOL"]
+
+using PyCall
+@pyimport pyplasm as p
+
+#p_VIEW = p["VIEW"]
+#p_STRUCT = p["STRUCT"]
+#p_MKPOL = p["MKPOL"]
 
 
 V,bases,coboundaries = Lar.chaincomplex(V,EV)
@@ -29,13 +32,15 @@ VV = [[k] for k=1:size(V,2)]
 model = (V, [VV,ev,fv])
 Plasm.view(Plasm.numbering(80.)(model))
 
-objs = lar2obj2D(V'::Lar.Points, [coboundaries...])  #va in errore
-open("./villa.obj", "w") do f
-	write(f, objs)
-end
+#next release:
 
-V,(EV,FV) = obj2lar2D("./villa.obj")
-
-Plasm.view(V',EV)
-Plasm.view(V',FV)
+#objs = lar2obj2D(V'::Lar.Points, [coboundaries...])  #va in errore
+#open("./villa.obj", "w") do f
+#	write(f, objs)
+#end
+#
+#V,(EV,FV) = obj2lar2D("./villa.obj")
+#
+#Plasm.view(V',EV)
+#Plasm.view(V',FV)
 
