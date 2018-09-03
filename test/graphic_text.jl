@@ -1,10 +1,10 @@
 using Plasm
 using PyCall
-
 p = PyCall.pyimport("pyplasm")
-p_VIEW = p["VIEW"]
-p_STRUCT = p["STRUCT"]
-p_MKPOL = p["MKPOL"]
+
+#p_VIEW = p["VIEW"]
+#p_STRUCT = p["STRUCT"]
+#p_MKPOL = p["MKPOL"]
 
 @testset "mini-FL Tests" begin
    @testset "comp" begin
@@ -163,7 +163,7 @@ end
 end
 
 @testset "various Tests" begin
-	charlist = "Alberto"
+	charlist = "Plasm"
 	@test Plasm.charpols(charlist)[2][2]==[[1, 2],[2, 3],[4, 5]]
 	@test typeof(Plasm.charpols(charlist))==
 	Array{Tuple{Array{Float64,2},Array{Array{Int64,1},1}},1}

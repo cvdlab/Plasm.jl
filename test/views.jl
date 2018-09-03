@@ -1,7 +1,9 @@
 using PyCall
-p = PyCall.pyimport("pyplasm")
-p_STRUCT = p["STRUCT"]
-p_MKPOL = p["MKPOL"]
+@pyimport pyplasm as p
+
+#p = PyCall.pyimport("pyplasm")
+#p_STRUCT = p["STRUCT"]
+#p_MKPOL = p["MKPOL"]
 
 @testset "View p.STRUCT" begin
 	geom_0 = hcat([[x] for x=0.:1.]...);

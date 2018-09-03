@@ -1,9 +1,11 @@
 using DataStructures
 
 using PyCall
-p_VIEW = p["VIEW"]
-p_STRUCT = p["STRUCT"]
-p_MKPOL = p["MKPOL"]
+@pyimport pyplasm as p
+
+#p_VIEW = p["VIEW"]
+#p_STRUCT = p["STRUCT"]
+#p_MKPOL = p["MKPOL"]
 
 using LinearAlgebraicRepresentation
 using Plasm
