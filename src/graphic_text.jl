@@ -54,7 +54,7 @@ function comp(funs)
 	  return x -> f(g(x))
 	end
     id = x->x
-    return reduce(compose, funs; init=id)
+    return reduce(compose, funs; id)
 end
 
 
@@ -469,7 +469,7 @@ end
 Redefined locally, as service to `textWithAttributes` implementation.
 """
 function cat(args)
-	return reduce( (x,y) -> append!(x,y), args; init=[] )
+	return reduce( (x,y) -> append!(x,y), args, [] )
 end
 
 
