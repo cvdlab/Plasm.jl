@@ -578,7 +578,6 @@ module Plasm
 	end
 	
 	
-
    include("./graphic_text.jl")
 
 end # module
