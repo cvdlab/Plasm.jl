@@ -5,10 +5,15 @@ module Plasm
 
 	using LinearAlgebraicRepresentation
 	using PyCall
-	
-	@pyimport pyplasm as p
+	using SparseArrays
+
+	p = PyCall.pyimport("pyplasm")
+	p_STRUCT = p["STRUCT"]
+	p_MKPOL = p["MKPOL"]
+	p_VIEW = p["VIEW"]
 	
 	import Base.view
+
 
 	"""
 		Points = Matrix
@@ -224,7 +229,7 @@ module Plasm
 	function mkpol(verts::Points, cells::Cells)::Hpc
 		verts = points2py(verts)
 		cells = cells2py(cells)
-		return p.MKPOL([verts,cells,[]])
+		return p_MKPOL([verts,cells,[]])
 	end
 
 
@@ -254,7 +259,7 @@ module Plasm
 	``` 
 	"""
 	function view(hpc::Hpc)
-		p.VIEW(hpc)
+		p_VIEW(hpc)
 	end
 	
 	
@@ -284,7 +289,7 @@ module Plasm
 	"""
 	function view(V::Points, CV::Cells)
 		hpc = lar2hpc(V::Points, CV::Cells)
-		p.VIEW(hpc)
+		p_VIEW(hpc)
 	end
 
 
@@ -310,7 +315,7 @@ module Plasm
 	"""
 	function view(model::LARmodel)
 		hpc = hpc_exploded(model::LARmodel)(1,1,1)
-		p.VIEW(hpc)
+		p_VIEW(hpc)
 	end
 
 
@@ -337,7 +342,7 @@ module Plasm
 	function view(pair::Tuple{Points,Cells})
 		V,CV = pair
 		hpc = lar2hpc(V::Points, CV::Cells)
-		p.VIEW(hpc)
+		p_VIEW(hpc)
 	end
 
 
@@ -394,7 +399,7 @@ module Plasm
 	"""
 	function view(scene::Array{Any,1})
 		if prod([isa(item[1:2],LinearAlgebraicRepresentation.LAR) for item in scene])
-			p.VIEW(p.STRUCT([Plasm.lar2hpc(item[1],item[2]) for item in scene]))
+			p_VIEW(p_STRUCT([Plasm.lar2hpc(item[1],item[2]) for item in scene]))
 		end
 	end
 
@@ -431,11 +436,11 @@ module Plasm
 					py_verts = Plasm.points2py(vcell)
 					py_cells = Plasm.cells2py( [collect(1:size(vcell,2))] )
 					
-					hpc = p.MKPOL([ py_verts, py_cells, [] ])
+					hpc = p_MKPOL([ py_verts, py_cells, [] ])
 					push!(out, hpc)
 				end
 			end
-			hpc = p.STRUCT(out)
+			hpc = p_STRUCT(out)
 			return hpc
 		end
 		return hpc_exploded0
@@ -526,7 +531,7 @@ module Plasm
 
 	"""
 	function lar2hpc(scene::Array{Any,1})::Hpc
-		hpc = p.STRUCT([ mkpol(item[1],item[2]) for item in scene ])
+		hpc = p_STRUCT([ mkpol(item[1],item[2]) for item in scene ])
 	end
 
 
