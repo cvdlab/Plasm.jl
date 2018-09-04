@@ -1,16 +1,6 @@
-<<<<<<< HEAD
-=======
-using LARVIEW
-using Base.Test
-using PyCall
-@pyimport LinearAlgebraicRepresentation as p
->>>>>>> a7ca073835114aee4ea8654cc10f634ba968865d
 
-#p = PyCall.pyimport("pyplasm")
-#p_STRUCT = p["STRUCT"]
-#p_MKPOL = p["MKPOL"]
 
-@testset "View p.STRUCT" begin
+@testset "View p_STRUCT" begin
 	geom_0 = hcat([[x] for x=0.:1.]...);
 	topol_0 = [[i,i+1] for i=1:1];
 	geom_1 = hcat([[x] for x=0.:.5:1.]...);

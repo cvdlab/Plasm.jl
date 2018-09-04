@@ -1,6 +1,3 @@
-using LinearAlgebraicRepresentation
-using LARVIEW
-using Test
 
 @testset "mini-FL Tests" begin
    @testset "comp" begin

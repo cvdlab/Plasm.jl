@@ -1,8 +1,12 @@
-using Base.Test
+using Test
 using LinearAlgebraicRepresentation
 using DataStructures
+
 using PyCall
-@pyimport pyplasm as p
+p = PyCall.pyimport("pyplasm")
+p_STRUCT = p["STRUCT"]
+p_MKPOL = p["MKPOL"]
+p_VIEW = p["VIEW"]
 
 using Plasm
 
