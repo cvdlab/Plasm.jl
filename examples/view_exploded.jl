@@ -1,8 +1,11 @@
 using LinearAlgebraicRepresentation
 Lar = LinearAlgebraicRepresentation
 using Plasm
+
 using PyCall
-@pyimport pyplasm as p
+p = PyCall.pyimport("pyplasm")
+
+p_VIEW = p["VIEW"]
 
 geom_0 = hcat([[x] for x=0.:10]...)
 topol_0 = [[i,i+1] for i=1:9]
@@ -14,8 +17,7 @@ model_1 = (geom_1,topol_1)
 model_2 = Lar.larModelProduct(model_0, model_1)
 model_3 = Lar.larModelProduct(model_2, model_1)
 
-
-p.VIEW(Plasm.lar2hpc(model_3...))
+p_VIEW(Plasm.lar2hpc(model_3...))
 V,CV = model_3
 
 hpc = Plasm.hpc_exploded( (V,[CV]) )(1.5,1.5,1.5)
@@ -47,6 +49,6 @@ V3 = [π/16 0 0; 0 2π/32 0; 0 0 1] * V
 W = [V3[:,k]-[π/2,π,1/2] for k=1:size(V3,2)] 
 Z = hcat( map(p->let (u,v,w) = p; [w*cos(u)*cos(v); w*cos(u)*sin(v); w*sin(u)] end, W) ...)
 Plasm.viewexploded(V3,CV)()
-Plasm.viewexploded(Z,CV)()
+Plasm.viewexploded(Z,CV)(2,2,2)
 
 

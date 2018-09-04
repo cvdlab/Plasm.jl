@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+using LARVIEW
+using Base.Test
+using PyCall
+@pyimport LinearAlgebraicRepresentation as p
+>>>>>>> a7ca073835114aee4ea8654cc10f634ba968865d
 
 #p = PyCall.pyimport("pyplasm")
 #p_STRUCT = p["STRUCT"]

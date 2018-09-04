@@ -1,11 +1,10 @@
-using LinearAlgebraicRepresentation
-Lar = LinearAlgebraicRepresentation
+using Lar
+Lar = Lar
 
 using Plasm
 
 using PyCall
-@pyimport pyplasm as p
-
+p = PyCall.pyimport()
 
 #####
 
@@ -52,6 +51,38 @@ Plasm.viewexploded(V',CV)
 
 V,(VV,EV,FV,CV) = Lar.larCuboids([2,2,1],true)
 V,bases,coboundaries = Lar.chaincomplex(V,FV,EV)
+
+# Collect LAR models in a single LAR model
+function collection2model(collection)
+  facespans = Array{Int64,1}[]
+  W,FW,EW,BF = collection[1]
+  shiftV = size(W,2)
+  shiftF = length(FW)
+  append!(facespans, [[1,shiftF]])
+  for k=2:length(collection)
+	 V,FV,EV,BF = collection[k]
+	 W = [W V]
+	 FW = [FW; FV + shiftV]
+	 EW = [EW; EV + shiftV]
+	 BF = [BF; BF + shiftF]
+	 shiftV = size(W,2)
+	 shiftF = length(FW)
+	 append!(facespans, [[facespans[end][2]+1,facespans[end][2]+shiftF]])
+  end
+  model,boundaries = (W,FW,EW),(BF,facespans)
+  return model,boundaries
+end
+
+collection = [[V',FV,EV,[]],[W',FW,EW,[]]]
+(V,FV,EV),_ = collection2model(collection)
+V,bases,coboundaries,_ = Lar.chaincomplex(V,FV,EV)
+
+
+######
+
+V,(VV,EV,FV,CV) = Lar.larCuboids([2,2,1],true)
+V,bases,coboundaries = Lar.chaincomplex(V,FV,EV)
+
 EV,FV,CV = bases
 cscEV,cscFE,cscCF = coboundaries
 Plasm.viewexploded(V,EV)
@@ -63,14 +94,16 @@ nv-ne+nf-nc
 #####
 
 V,(VV,EV,FV,CV) = Lar.larCuboids([2,2,1],true)
+
 W,FW,EW = copy(V),copy(FV),copy(EV)
 collection = [[W,FW,EW]]
 for k=1:10
-	W,FW,EW = rotate([0,0,π/15],copy(W)+.5),copy(FV),copy(EV)
-	append!(collection, [[W,FV,EV]])
+	W,FW,EW = Plasm.rotate([0,0,π/15],copy(W)+.5),copy(FW),copy(EW)
+	append!(collection, [[W,FW,EW]])
 end
 V,FV,EV = Lar.collection2model(collection)
 V,bases,coboundaries = Lar.chaincomplex(V,FV,EV)
+
 EV,FV,CV = bases
 cscEV,cscFE,cscCF = coboundaries
 Plasm.viewexploded(V,EV)
