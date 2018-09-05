@@ -1,17 +1,5 @@
-using DataStructures
-
-using PyCall
-p = PyCall.pyimport("pyplasm")
-
-p_VIEW = p["VIEW"]
-p_STRUCT = p["STRUCT"]
-p_MKPOL = p["MKPOL"]
-
-using LinearAlgebraicRepresentation
-using Plasm
 
 import Base.cat
-
 
 L = LinearAlgebraicRepresentation
 
@@ -155,12 +143,6 @@ julia> Plasm.distr(([1,2,3],10))
  [1, 10]
  [2, 10]
  [3, 10]
-
-julia> Plasm.distr([[1,2,3],10])
-3-element Array{Array{Int64,1},1}:
- [1, 10]
- [2, 10]
- [3, 10]
 ```
 """
 function distr(args)
@@ -181,12 +163,6 @@ Return the `pair` array with `x` coupled with the elements of `args`.
 
 ```
 julia> Plasm.distl((10, [1,2,3]))
-3-element Array{Array{Int64,1},1}:
- [10, 1]
- [10, 2]
- [10, 3]
-
-julia> Plasm.distl([10, [1,2,3]])
 3-element Array{Array{Int64,1},1}:
  [10, 1]
  [10, 2]
@@ -338,7 +314,7 @@ julia> Plasm.ascii_LAR[126]
 ([1.0 1.75 2.75 3.5; 5.0 5.5 5.0 5.5], Array{Int64,1}[[1, 2], [2, 3], [3, 4]])
 ```
 """
-ascii_LAR = OrderedDict(zip(32:126,Plasm.hpcs))
+ascii_LAR = DataStructures.OrderedDict(zip(32:126,Plasm.hpcs))
 
 
 
@@ -518,7 +494,7 @@ The embedding is done by adding ``d`` zero coordinates to each vertex.
 julia> square = LinearAlgebraicRepresentation.cuboid([1,1])
 ([0.0 0.0 1.0 1.0; 0.0 1.0 0.0 1.0], Array{Int64,1}[[1, 2, 3, 4]])
 
-julia> embed(1)(square)
+julia> Plasm.embed(1)(square)
 ([0.0 0.0 1.0 1.0; 0.0 1.0 0.0 1.0; 0.0 0.0 0.0 0.0], Array{Int64,1}[[1, 2, 3, 4]])
 ```
 """
@@ -547,6 +523,7 @@ Plasm.view(Plasm.numbering(1.5)(model))
 ```
 """ 
 function numbering(numberSizeScaling=1) 
+	p = PyCall.pyimport("pyplasm")
 	function numbering0(model) 
 		V,cells = model
 		if size(V,1)==2 
@@ -557,7 +534,7 @@ function numbering(numberSizeScaling=1)
 		gcode = Plasm.textWithAttributes("centre", 0, 0.1ns, 0.2ns, 0.025ns)
 		scene = [wireframe]
 		for (h,skel) in enumerate(cells)
-			colors = [p.GREEN,p.YELLOW,p.CYAN,p.ORANGE]
+			colors = [p["GREEN"],p["YELLOW"],p["CYAN"],p["ORANGE"]]
 			nums = []
 			for (k,cell) in enumerate(skel)
 				center = sum([V[:,v] for v in cell])/length(cell)
@@ -567,9 +544,9 @@ function numbering(numberSizeScaling=1)
 					LinearAlgebraicRepresentation.t(center...), LinearAlgebraicRepresentation.s(scaling...), code ]) ))
 			end
 			hpc = Plasm.lar2hpc(nums)
-			push!( scene, p.COLOR(colors[h])(hpc) )
+			push!( scene, p["COLOR"](colors[h])(hpc) )
 		end
-		p.STRUCT( scene )
+		p["STRUCT"]( scene )
 	end
 	return numbering0
 end
