@@ -541,6 +541,8 @@ Plasm.view(Plasm.numbering(1.5)(model))
 ```
 """ 
 function numbering(numberSizeScaling=1) 
+	using PyCall
+	p = PyCall.pyimport("pyplasm")
 	function numbering0(model) 
 		V,cells = model
 		if size(V,1)==2 
