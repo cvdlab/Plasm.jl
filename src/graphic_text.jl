@@ -534,7 +534,7 @@ function numbering(numberSizeScaling=1)
 		gcode = Plasm.textWithAttributes("centre", 0, 0.1ns, 0.2ns, 0.025ns)
 		scene = [wireframe]
 		for (h,skel) in enumerate(cells)
-			colors = [p["GREEN"],p["YELLOW"],p["CYAN"],p["ORANGE"]]
+			colors = [p["GREEN"], p["YELLOW"], p["CYAN"], p["ORANGE"]]
 			nums = []
 			for (k,cell) in enumerate(skel)
 				center = sum([V[:,v] for v in cell])/length(cell)

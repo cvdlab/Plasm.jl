@@ -13,18 +13,11 @@ EV = Array{Int64,1}[[1, 2], [3, 4], [5, 6], [7, 8], [9, 10], [11, 12], [13, 14],
 
 using DataStructures
 using LinearAlgebraicRepresentation
-Lar = LinearAlgebraicRepresentation
+L = LinearAlgebraicRepresentation
 using Plasm
 
-using PyCall
-@pyimport pyplasm as p
 
-#p_VIEW = p["VIEW"]
-#p_STRUCT = p["STRUCT"]
-#p_MKPOL = p["MKPOL"]
-
-
-V,bases,coboundaries = Lar.chaincomplex(V,EV)
+V,bases,coboundaries = L.chaincomplex(V,EV)
 Plasm.view(V,bases[1])
 
 ev,fv=bases

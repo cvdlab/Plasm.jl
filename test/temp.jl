@@ -2,11 +2,6 @@
 centroid(V::Array{Float64,2}) = sum(V,2)/size(V,2)
 centroid(V::Array{Int64,2}) = sum(V,2)/size(V,2)
 
-function mkpols(V,CV)
-	W = [Any[V[h,k] for h=1:size(V,1)] for k=1:size(V,2)]
-	CW = convert(Array{Array{Any,1},1},CV)
-	hpc = p.STRUCT([p.MKPOL(PyObject([W,[cell],[]])) for cell in CW])
-end
 
 
 

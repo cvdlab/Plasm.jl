@@ -3,9 +3,6 @@ Lar = Lar
 
 using Plasm
 
-using PyCall
-p = PyCall.pyimport()
-
 #####
 
 ncubes = 3
