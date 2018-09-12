@@ -1,13 +1,17 @@
+
 module Plasm
 
 	#export centroid, cuboidGrid, mkpol, view, hpc_exploded, lar2hpc
 
 	using LinearAlgebraicRepresentation
+	using DataStructures
+	using SparseArrays
 	using PyCall
-	
-	@pyimport pyplasm as p
+
+	global const p = PyCall.pyimport("pyplasm")
 	
 	import Base.view
+
 
 	"""
 		Points = Matrix
@@ -54,7 +58,7 @@ module Plasm
 	representation of an operator between linear spaces of `P-chains`. 
 	Operators ``P-Boundary : P-Chain -> (P-1)-Chain``
 	and ``P-Coboundary : P-Chain -> (P+1)-Chain`` are typically stored as 
-	`ChainOp` with elements in `` {-1,0,1 }`` or in `` {0,1 }``, for 
+	`ChainOp` with elements in ``{-1,0,1}`` or in ``{0,1}``, for 
 	*signed* and *unsigned* operators, respectively.
 	"""
 	const ChainOp = SparseMatrixCSC{Int8,Int}
@@ -67,7 +71,7 @@ module Plasm
 	1-dimensional `Array` of `ChainOp` that provides storage for either the 
 	*chain of boundaries* (from `D` to `0`) or the transposed *chain of coboundaries* 
 	(from `0` to `D`), with `D` the dimension of the embedding space, which may be either 
-	`` R^2`` or `` R^3``.
+	``R^2`` or ``R^3``.
 	"""
 	const ChainComplex = Array{ChainOp,1}
 	
@@ -111,12 +115,46 @@ module Plasm
 	"""
 		cuboidGrid(shape::Array{Int64,1}[, full=false])::Union{LAR,LARmodel}
 
-	compute a *cellular complex* (mesh) with *cuboidal cells* of either `LARmodel` 
-	or `LAR` type, depending of the value of optional `full` parameter. The default is
+	Compute a *cellular complex* (mesh) with *cuboidal cells* of either `LARmodel` 
+	or `LAR` type, depending on optional `full` parameter. 
+	
+	The default is
 	for returning a `LAR` value, i.e. a pair `(Points, Cells)`.
 	The *dimension* of `Cells` is the one of the number `M` of rows of 
 	cell `Points`. The dimensions of `Array{Cells,1}` in `LARmodel` run 
 	from ``1`` to ``M``.
+	
+	# Example 
+	```
+	julia> V, CV = Plasm.cuboidGrid([2,2,1])
+	([0.0 0.0 … 2.0 2.0; 0.0 0.0 … 2.0 2.0; 0.0 1.0 … 0.0 1.0], 
+	Array{Int64,1}[[1,2,3,4,7,8,9,10], [3,4,5,6,9,10,11,12], [7,8,9,10,13,14,15,16],
+	[9,10,11,12,15,16,17,18]])
+
+	julia> V, (VV,EV,FV,CV) = Plasm.cuboidGrid([2,2,1],true);
+
+	julia> V
+	3×18 Array{Float64,2}:
+	 0.0  0.0  0.0  0.0  0.0  0.0  1.0  1.0  1.0  1.0  1.0  1.0  2.0  2.0  2.0  2.0  2.0  2.0
+	 0.0  0.0  1.0  1.0  2.0  2.0  0.0  0.0  1.0  1.0  2.0  2.0  0.0  0.0  1.0  1.0  2.0  2.0
+	 0.0  1.0  0.0  1.0  0.0  1.0  0.0  1.0  0.0  1.0  0.0  1.0  0.0  1.0  0.0  1.0  0.0  1.0
+
+	julia> VV
+	18-element Array{Array{Int64,1},1}:
+	[1],[2],[3],[4],...,[12],[13],[14],[15],[16],[17],[18]
+ 
+	julia> EV
+	33-element Array{Array{Int64,1},1}:
+	[1,2],[3,4],[5,6],[7,8],[9,10],[11,12],,[7,13],[8,14],[9,15],[10,16],[11,17],[12,18]
+
+	julia> FV
+	20-element Array{Array{Int64,1},1}:
+	[1,2,3,4],[3,4,5,6],[7,8,9,10],[9,10,11,12],[13,14,15,16],[15,16,17,18],[1,2,7,8],[3,4,9,10],⋮,[2,4,8,10],[3,5,9,11],[4,6,10,12],[7,9,13,15],[8,10,14,16],[9,11,15,17],[10,12,16,18]
+
+	julia> CV
+	4-element Array{Array{Int64,1},1}:
+	[1,2,3,4,7,8,9,10],[3,4,5,6,9,10,11,12],[7,8,9,10,13,14,15,16],[9,10,11,12,15,16,17,18]
+	```
 	"""
 	cuboidGrid = LinearAlgebraicRepresentation.larCuboids
 
@@ -124,12 +162,14 @@ module Plasm
 	"""
 		centroid( V::Points )::Array{Float64,1}
 		
-	*Geometric center* of a `Points` 2-array of `size` ``(M,N)``. Each of the 
+	*Geometric center* (or *barycenter*) of a `Points` 2-array of `size` ``(M,N)``. 
+	
+	Each of the 
 	``M`` coordinates of *barycenter* of the dense array of ``N`` `points` is the *mean*
 	of the corresponding `Points` coordinates.
 	"""
 	function centroid( V::Points )::Array{Float64,2}
-		return sum(V,2)/size(V,2)
+		return sum(V, dims=2)/size(V,2)
 	end
 	
 
@@ -146,7 +186,7 @@ module Plasm
     
     
 	"""
-		cells2py(cells::Cells)::PyObject
+		cells2py(cells::LinearAlgebraicRepresentation.Cells)::PyObject
 		
 	Return a `Cells` object in a *Python* source text format. The returned `PyObject` is
 	 a list of lists of integers.
@@ -167,7 +207,7 @@ module Plasm
 	[1, 3, 5, 7], [2, 4, 6, 8]]
 	```
 	"""
-	function cells2py(cells::Cells)::PyObject
+	function cells2py(cells::LinearAlgebraicRepresentation.Cells)::PyObject
 		return PyObject([Any[cell[h] for h=1:length(cell)] for cell in cells])
 	end
 
@@ -212,25 +252,24 @@ module Plasm
 	```julia
 	julia> V,(VV,EV,FV,CV) = LinearAlgebraicRepresentation.cuboid([1,1,1],true);
 	
-	julia> Plasm.mkpol(V,EV)
+	julia> hpc = Plasm.mkpol(V,EV)
 	PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 
 	'std::shared_ptr< Hpc > *' at 0x12cf45d50> >
-
-	julia> Plasm.view(Plasm.mkpol(V,EV))	
-	[...]
-	```
+		```
 	"""
-	function mkpol(verts::Points, cells::Cells)::Hpc
-		verts = points2py(verts)
-		cells = cells2py(cells)
-		return p.MKPOL([verts,cells,[]])
+	function mkpol( verts::Plasm.Points, cells::Plasm.Cells )::Plasm.Hpc
+		p =PyCall.pyimport("pyplasm")
+		Verts = Plasm.points2py(verts)
+		Cells = Plasm.cells2py(cells)
+		Mkpol = p["MKPOL"]
+		return Mkpol(PyVector([Verts,Cells,[]]))
 	end
 
 
 
 	
 	"""
-		view(hpc::Hpc)
+		view(hpc::Plasm.Hpc)
 		
 	Base.view extension. 
 	Display a *Python*  `HPC` (Hierarchica Polyhedral Complex) `object` using 
@@ -252,8 +291,9 @@ module Plasm
 	julia> Plasm.view(hpc)
 	``` 
 	"""
-	function view(hpc::Hpc)
-		p.VIEW(hpc)
+	function view(hpc::Plasm.Hpc)
+		p =PyCall.pyimport("pyplasm")
+		p["VIEW"](hpc)
 	end
 	
 	
@@ -278,12 +318,12 @@ module Plasm
 
 	julia> 
 	Plasm.view(Plasm.mkpol(V,CV))	
-	[...]
 	```
 	"""
 	function view(V::Points, CV::Cells)
+		p =PyCall.pyimport("pyplasm")
 		hpc = lar2hpc(V::Points, CV::Cells)
-		p.VIEW(hpc)
+		p["VIEW"](hpc)
 	end
 
 
@@ -308,8 +348,9 @@ module Plasm
 	```
 	"""
 	function view(model::LARmodel)
-		hpc = hpc_exploded(model::LARmodel)(1,1,1)
-		p.VIEW(hpc)
+		p =PyCall.pyimport("pyplasm")
+		hpc = hpc_exploded(model::LARmodel)(1.2,1.2,1.2)
+		p["VIEW"](hpc)
 	end
 
 
@@ -334,9 +375,10 @@ module Plasm
 	```
 	"""
 	function view(pair::Tuple{Points,Cells})
+		p =PyCall.pyimport("pyplasm")
 		V,CV = pair
 		hpc = lar2hpc(V::Points, CV::Cells)
-		p.VIEW(hpc)
+		p["VIEW"](hpc)
 	end
 
 
@@ -377,7 +419,7 @@ module Plasm
 	
 		`evalStruct(scene::Struct)::Array{Any,1}`
 	
-	``` 
+	```julia
 	cube = LinearAlgebraicRepresentation.apply( LinearAlgebraicRepresentation.t(-.5,-.5,0), LinearAlgebraicRepresentation.cuboid([1,1,1]));
 	tableTop = LinearAlgebraicRepresentation.Struct([ LinearAlgebraicRepresentation.t(0,0,.85), LinearAlgebraicRepresentation.s(1,1,.05), cube ]);
 	tableLeg = LinearAlgebraicRepresentation.Struct([ LinearAlgebraicRepresentation.t(-.475,-.475,0), LinearAlgebraicRepresentation.s(.1,.1,.89), cube ]);
@@ -392,8 +434,9 @@ module Plasm
 	```
 	"""
 	function view(scene::Array{Any,1})
+		p =PyCall.pyimport("pyplasm")
 		if prod([isa(item[1:2],LinearAlgebraicRepresentation.LAR) for item in scene])
-			p.VIEW(p.STRUCT([Plasm.lar2hpc(item[1],item[2]) for item in scene]))
+			p["VIEW"](p["STRUCT"]([Plasm.lar2hpc(item[1],item[2]) for item in scene]))
 		end
 	end
 
@@ -408,12 +451,14 @@ module Plasm
 	
 	# Example
 	```julia
-	julia> hpc = Plasm.hpc_exploded(LinearAlgebraicRepresentation.cuboidGrid([3,2,1], true))(1.5,1.5,1.5)
+	julia> hpc = Plasm.hpc_exploded(
+		LinearAlgebraicRepresentation.cuboidGrid([3,2,1], true))(1.5,1.5,1.5)
 	
 	julia> view(hpc)
 	```
 	"""
 	function hpc_exploded( model )
+		p =PyCall.pyimport("pyplasm")
 		function hpc_exploded0( sx=1.2, sy=1.2, sz=1.2 )
 			verts,cells = model
 			out = []
@@ -430,11 +475,11 @@ module Plasm
 					py_verts = Plasm.points2py(vcell)
 					py_cells = Plasm.cells2py( [collect(1:size(vcell,2))] )
 					
-					hpc = p.MKPOL([ py_verts, py_cells, [] ])
+					hpc = p["MKPOL"]([ py_verts, py_cells, [] ])
 					push!(out, hpc)
 				end
 			end
-			hpc = p.STRUCT(out)
+			hpc = p["STRUCT"](out)
 			return hpc
 		end
 		return hpc_exploded0
@@ -457,12 +502,11 @@ module Plasm
 	```julia
 	julia> V,(VV,EV,FV,CV) = LinearAlgebraicRepresentation.cuboid([1,1,1],true);
 	
-	julia> hpc = lar2hpc( (V, CV)::LAR ... )::Hpc
+	julia> hpc = lar2hpc( (V, CV)::Plasm.LAR ... )::Hpc
 	PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 
 	'std::shared_ptr< Hpc > *' at 0x12cf45d50> >
 
 	julia> view(hpc)	
-	[...]
 	```
 	"""
 	function lar2hpc(V::Points, CV::Cells)::Hpc
@@ -525,7 +569,8 @@ module Plasm
 
 	"""
 	function lar2hpc(scene::Array{Any,1})::Hpc
-		hpc = p.STRUCT([ mkpol(item[1],item[2]) for item in scene ])
+		p =PyCall.pyimport("pyplasm")
+		hpc = p["STRUCT"]([ mkpol(item[1],item[2]) for item in scene ])
 	end
 
 
