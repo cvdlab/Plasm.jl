@@ -551,7 +551,7 @@ function numbering(numberSizeScaling=1)
 		gcode = Plasm.textWithAttributes("centre", 0, 0.1ns, 0.2ns, 0.025ns)
 		scene = [wireframe]
 		for (h,skel) in enumerate(cells)
-			colors = [p.GREEN,p.YELLOW,p.CYAN,p.ORANGE]
+			colors = [p["GREEN"]",p["YELLOW"]",p["CYAN"]",p["ORANGE"]"]
 			nums = []
 			for (k,cell) in enumerate(skel)
 				center = sum([V[:,v] for v in cell])/length(cell)
@@ -561,9 +561,9 @@ function numbering(numberSizeScaling=1)
 					LinearAlgebraicRepresentation.t(center...), LinearAlgebraicRepresentation.s(scaling...), code ]) ))
 			end
 			hpc = Plasm.lar2hpc(nums)
-			push!( scene, p.COLOR(colors[h])(hpc) )
+			push!( scene, p["COLOR"](colors[h])(hpc) )
 		end
-		p.STRUCT( scene )
+		p["STRUCT"]( scene )
 	end
 	return numbering0
 end
