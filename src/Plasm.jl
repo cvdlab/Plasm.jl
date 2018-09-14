@@ -7,7 +7,7 @@ module Plasm
 	using DataStructures
 	using PyCall
 
-	global const p = PyCall.pyimport("pyplasm")
+	@pyimport pyplasm as p
 	
 	import Base.view
 

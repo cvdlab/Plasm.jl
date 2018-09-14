@@ -1,7 +1,4 @@
 
-#p_VIEW = p["VIEW"]
-#p_STRUCT = p["STRUCT"]
-#p_MKPOL = p["MKPOL"]
 
 @testset "mini-FL Tests" begin
    @testset "comp" begin

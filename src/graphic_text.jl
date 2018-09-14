@@ -1,9 +1,6 @@
 using DataStructures
-using PyCall
-
 using LinearAlgebraicRepresentation
 Lar = LinearAlgebraicRepresentation
-using Plasm
 
 import Base.cat
 
@@ -542,8 +539,7 @@ Plasm.view(Plasm.numbering(1.5)(model))
 ```
 """ 
 function numbering(numberSizeScaling=1) 
-	#using PyCall
-	#p = PyCall.pyimport("pyplasm")
+	#@pyimport pyplasm as p
 	function numbering0(model) 
 		V,cells = model
 		if size(V,1)==2 
@@ -554,7 +550,7 @@ function numbering(numberSizeScaling=1)
 		gcode = Plasm.textWithAttributes("centre", 0, 0.1ns, 0.2ns, 0.025ns)
 		scene = [wireframe]
 		for (h,skel) in enumerate(cells)
-			colors = [p["GREEN"]",p["YELLOW"]",p["CYAN"]",p["ORANGE"]"]
+			colors = [p.GREEN, p.YELLOW, p.CYAN, p.ORANGE]
 			nums = []
 			for (k,cell) in enumerate(skel)
 				center = sum([V[:,v] for v in cell])/length(cell)
@@ -564,9 +560,9 @@ function numbering(numberSizeScaling=1)
 					Lar.t(center...), Lar.s(scaling...), code ]) ))
 			end
 			hpc = Plasm.lar2hpc(nums)
-			push!( scene, p["COLOR"](colors[h])(hpc) )
+			push!( scene, p.COLOR(colors[h])(hpc) )
 		end
-		p["STRUCT"]( scene )
+		p.STRUCT( scene )
 	end
 	return numbering0
 end
