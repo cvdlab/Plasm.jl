@@ -170,7 +170,7 @@ end
 	Array{Array{Int64,1},1}
 	@test Plasm.distr([[1,2,3],0])==[[1,0],[2,0],[3,0]]
 	@test Plasm.cat([[1,2],[3,4]])==[1,2,3,4]
-	@test Plasm.translate(-1)(LinearAlgebraicRepresentation.cuboid([1,1]))==
+	@test Plasm.translate(-1)(Lar.cuboid([1,1]))==
 	([-1.0 -1.0 0.0 0.0; 0.0 1.0 0.0 1.0], Array{Int64,1}[[1, 2, 3, 4]])
 end
 

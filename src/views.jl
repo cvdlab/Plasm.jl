@@ -1,3 +1,4 @@
+Lar = LinearAlgebraicRepresentation
 
 """
 	cuboidGrid(shape::Array{Int64,1}[, full=false])::Union{LAR,LARmodel}
@@ -43,11 +44,11 @@ julia> CV
 [1,2,3,4,7,8,9,10],[3,4,5,6,9,10,11,12],[7,8,9,10,13,14,15,16],[9,10,11,12,15,16,17,18]
 ```
 """
-cuboidGrid = LinearAlgebraicRepresentation.larCuboids
+cuboidGrid = Lar.larCuboids
 
 
 """
-	centroid( V::Points )::Array{Float64,1}
+	centroid( V::Lar.Points )::Array{Float64,1}
 	
 *Geometric center* (or *barycenter*) of a `Points` 2-array of `size` ``(M,N)``. 
 
@@ -61,7 +62,7 @@ end
 
 
 """
-	centroid(V::Array{Float64,2})::Array{Float64,1}
+	centroid(V::Lar.Points)::Array{Float64,1}
 	
 *Geometric center* of a `Points` 2-array of `size` ``(M,N)``. Each of the 
 ``M`` coordinates of *barycenter* of the dense array of ``N`` `points` is the *mean*
@@ -73,14 +74,14 @@ end
 
 
 """
-	cells2py(cells::LinearAlgebraicRepresentation.Cells)::PyObject
+	cells2py(cells::Lar.Cells)::PyObject
 	
 Return a `Cells` object in a *Python* source text format. The returned `PyObject` is
  a list of lists of integers.
 
 # Example
 ``` julia
-julia> FV = LinearAlgebraicRepresentation.cuboid([1,1,1],true)[2][3]
+julia> FV = Lar.cuboid([1,1,1],true)[2][3]
 6-element Array{Array{Int64,1},1}:
  [1, 2, 3, 4]
  [5, 6, 7, 8]
@@ -94,7 +95,7 @@ PyObject [[1, 2, 3, 4], [5, 6, 7, 8], [1, 2, 5, 6], [3, 4, 7, 8],
 [1, 3, 5, 7], [2, 4, 6, 8]]
 ```
 """
-function cells2py(cells::LinearAlgebraicRepresentation.Cells)::PyObject
+function cells2py(cells::Lar.Cells)::PyObject
 	return PyObject([Any[cell[h] for h=1:length(cell)] for cell in cells])
 end
 
@@ -108,7 +109,7 @@ Return a `Points` object in a *Python* source text format. The returned `PyObjec
 
 # Example
 ``` julia
-julia> V = LinearAlgebraicRepresentation.cuboid([1,1,1])[1]
+julia> V = Lar.cuboid([1,1,1])[1]
 3×8 Array{Float64,2}:
  0.0  0.0  0.0  0.0  1.0  1.0  1.0  1.0
  0.0  0.0  1.0  1.0  0.0  0.0  1.0  1.0
@@ -137,7 +138,7 @@ current `Python` library [*https://github.com/plasm-language/pyplasm*]
 (https://github.com/plasm-language/pyplasm).
 
 ```julia
-julia> V,(VV,EV,FV,CV) = LinearAlgebraicRepresentation.cuboid([1,1,1],true);
+julia> V,(VV,EV,FV,CV) = Lar.cuboid([1,1,1],true);
 
 julia> hpc = Plasm.mkpol(V,EV)
 PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 
@@ -165,7 +166,7 @@ for *big geometric data* structures.
 
 # Example
 ``` julia
-julia> m = LinearAlgebraicRepresentation.cuboidGrid([2,2],true)
+julia> m = Lar.cuboidGrid([2,2],true)
 ([0.0 0.0 … 2.0 2.0; 0.0 1.0 … 1.0 2.0], Array{Array{Int64,1},1}[Array{Int64,1}[[1], 
 [2], [3], [4], [5], [6], [7], [8], [9]], Array{Int64,1}[[1, 2], [2, 3], [4, 5], [5, 
 6], [7, 8], [8, 9], [1, 4], [2, 5], [3, 6], [4, 7], [5, 8], [6, 9]], 
@@ -197,7 +198,7 @@ type.
 # Example
 
 ```julia
-julia> V,(VV,EV,FV,CV) = LinearAlgebraicRepresentation.cuboid([1,1,1],true);
+julia> V,(VV,EV,FV,CV) = Lar.cuboid([1,1,1],true);
 
 julia> Plasm.mkpol(V,CV)
 PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 
@@ -226,10 +227,10 @@ for *big geometric data* structures. The input is a `LARmodel` object.
 # Example
 
 ```julia
-julia> typeof( LinearAlgebraicRepresentation.cuboid([1,1,1], true) )
+julia> typeof( Lar.cuboid([1,1,1], true) )
 Tuple{Array{Float64,2},Array{Array{Int64,1},1}}
 
-julia> V,(VV,EV,FV,CV) = LinearAlgebraicRepresentation.cuboid([.5,.5,.5], true);
+julia> V,(VV,EV,FV,CV) = Lar.cuboid([.5,.5,.5], true);
 
 julia> Plasm.view( (V,[VV,EV,FV,CV]) )
 ```
@@ -253,10 +254,10 @@ for *big geometric data* structures. The input is a `pair` of type
 
 # Example
 ```julia
-julia> typeof(LinearAlgebraicRepresentation.cuboid([1,1,1])::LAR)
+julia> typeof(Lar.cuboid([1,1,1])::LAR)
 Tuple{Array{Float64,2},Array{Array{Int64,1},1}}
 	
-julia> V,(VV,EV,FV,CV) = LinearAlgebraicRepresentation.cuboid([1,1,1], true);
+julia> V,(VV,EV,FV,CV) = Lar.cuboid([1,1,1], true);
 	
 julia> Plasm.view( (V,FV) );
 ```
@@ -270,24 +271,24 @@ end
 
 
 """
-	view(obj::LinearAlgebraicRepresentation.Struct)
+	view(obj::Lar.Struct)
 
 Display a geometric value of `Struct` type, via conversion to `LAR`
 and then to `Hpc` values. 
 
 # Example
 ```julia
-cube = LinearAlgebraicRepresentation.apply( LinearAlgebraicRepresentation.t(-.5,-.5,0), LinearAlgebraicRepresentation.cuboid([1,1,1]));
-tableTop = LinearAlgebraicRepresentation.Struct([ LinearAlgebraicRepresentation.t(0,0,.85), LinearAlgebraicRepresentation.s(1,1,.05), cube ]);
-tableLeg = LinearAlgebraicRepresentation.Struct([ LinearAlgebraicRepresentation.t(-.475,-.475,0), LinearAlgebraicRepresentation.s(.1,.1,.89), cube ]);
-tablelegs = LinearAlgebraicRepresentation.Struct( repeat([ tableLeg, LinearAlgebraicRepresentation.r(0,0,pi/2) ],outer=4) );
-table = LinearAlgebraicRepresentation.Struct([ tableTop, tablelegs ]);
+cube = Lar.apply( Lar.t(-.5,-.5,0), Lar.cuboid([1,1,1]));
+tableTop = Lar.Struct([ Lar.t(0,0,.85), Lar.s(1,1,.05), cube ]);
+tableLeg = Lar.Struct([ Lar.t(-.475,-.475,0), Lar.s(.1,.1,.89), cube ]);
+tablelegs = Lar.Struct( repeat([ tableLeg, Lar.r(0,0,pi/2) ],outer=4) );
+table = Lar.Struct([ tableTop, tablelegs ]);
 
 Plasm.view(table)
 ```
 """
-function view(obj::LinearAlgebraicRepresentation.Struct)
-	lar = LinearAlgebraicRepresentation.struct2lar(obj)
+function view(obj::Lar.Struct)
+	lar = Lar.struct2lar(obj)
 	view(lar)
 end
 
@@ -307,13 +308,13 @@ must be converted to `Array{Any,1}` by the expression
 	`evalStruct(scene::Struct)::Array{Any,1}`
 
 ```julia
-cube = LinearAlgebraicRepresentation.apply( LinearAlgebraicRepresentation.t(-.5,-.5,0), LinearAlgebraicRepresentation.cuboid([1,1,1]));
-tableTop = LinearAlgebraicRepresentation.Struct([ LinearAlgebraicRepresentation.t(0,0,.85), LinearAlgebraicRepresentation.s(1,1,.05), cube ]);
-tableLeg = LinearAlgebraicRepresentation.Struct([ LinearAlgebraicRepresentation.t(-.475,-.475,0), LinearAlgebraicRepresentation.s(.1,.1,.89), cube ]);
-tablelegs = LinearAlgebraicRepresentation.Struct( repeat([ tableLeg, LinearAlgebraicRepresentation.r(0,0,pi/2) ],outer=4) );
-table = LinearAlgebraicRepresentation.Struct([ tableTop, tablelegs ]);
+cube = Lar.apply( Lar.t(-.5,-.5,0), Lar.cuboid([1,1,1]));
+tableTop = Lar.Struct([ Lar.t(0,0,.85), Lar.s(1,1,.05), cube ]);
+tableLeg = Lar.Struct([ Lar.t(-.475,-.475,0), Lar.s(.1,.1,.89), cube ]);
+tablelegs = Lar.Struct( repeat([ tableLeg, Lar.r(0,0,pi/2) ],outer=4) );
+table = Lar.Struct([ tableTop, tablelegs ]);
 
-scene = LinearAlgebraicRepresentation.evalStruct(table);
+scene = Lar.evalStruct(table);
 # output
 # 5-element Array{Any,1}
 
@@ -322,7 +323,7 @@ Plasm.view(scene)
 """
 function view(scene::Array{Any,1})
 	p =PyCall.pyimport("pyplasm")
-	if prod([isa(item[1:2],LinearAlgebraicRepresentation.LAR) for item in scene])
+	if prod([isa(item[1:2],Lar.LAR) for item in scene])
 		p["VIEW"](p["STRUCT"]([Plasm.lar2hpc(item[1],item[2]) for item in scene]))
 	end
 end
@@ -339,7 +340,7 @@ single `LAR` object before explosion.
 # Example
 ```julia
 julia> hpc = Plasm.hpc_exploded(
-	LinearAlgebraicRepresentation.cuboidGrid([3,2,1], true))(1.5,1.5,1.5)
+	Lar.cuboidGrid([3,2,1], true))(1.5,1.5,1.5)
 
 julia> view(hpc)
 ```
@@ -387,7 +388,7 @@ current `Python` library [*https://github.com/plasm-language/pyplasm*]
 # Example
 
 ```julia
-julia> V,(VV,EV,FV,CV) = LinearAlgebraicRepresentation.cuboid([1,1,1],true);
+julia> V,(VV,EV,FV,CV) = Lar.cuboid([1,1,1],true);
 
 julia> hpc = lar2hpc( (V, CV)::Plasm.LAR ... )::Hpc
 PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 
@@ -416,7 +417,7 @@ current `Python` library [*https://github.com/plasm-language/pyplasm*]
 
 # Example
 ```julia
-julia> model = LinearAlgebraicRepresentation.cuboid([1,1,1],true);
+julia> model = Lar.cuboid([1,1,1],true);
 
 julia> view( Plasm.lar2hpc(model) )
 
@@ -443,13 +444,13 @@ square = ([[0; 0] [0; 1] [1; 0] [1; 1]], [[1, 2, 3, 4]],
 [[1,2], [1,3], [2,4], [3,4]])
 V,FV,EV  =  square
 model  =  V,([[1],[2],[3],[4]],EV,FV)
-table = LinearAlgebraicRepresentation.apply(LinearAlgebraicRepresentation.t(-0.5,-0.5), square)
-chair = LinearAlgebraicRepresentation.Struct([LinearAlgebraicRepresentation.t(0.75,0),LinearAlgebraicRepresentation.s(0.35,0.35),table])
-structo = LinearAlgebraicRepresentation.Struct([LinearAlgebraicRepresentation.t(2,1),table,repeat([LinearAlgebraicRepresentation.r(pi/2),chair],
+table = Lar.apply(Lar.t(-0.5,-0.5), square)
+chair = Lar.Struct([Lar.t(0.75,0),Lar.s(0.35,0.35),table])
+structo = Lar.Struct([Lar.t(2,1),table,repeat([Lar.r(pi/2),chair],
 		outer = 4)...])
-structo1 = LinearAlgebraicRepresentation.Struct(repeat([structo,LinearAlgebraicRepresentation.t(0,2.5)],outer = 10));
-structo2 = LinearAlgebraicRepresentation.Struct(repeat([structo1,LinearAlgebraicRepresentation.t(3,0)],outer = 10));
-scene = LinearAlgebraicRepresentation.evalStruct(structo2);
+structo1 = Lar.Struct(repeat([structo,Lar.t(0,2.5)],outer = 10));
+structo2 = Lar.Struct(repeat([structo1,Lar.t(3,0)],outer = 10));
+scene = Lar.evalStruct(structo2);
 
 Plasm.view(Plasm.lar2hpc(scene))
 ```
@@ -463,7 +464,7 @@ end
 
 
 """
-	lar2exploded_hpc(V::LinearAlgebraicRepresentation.Points,CV::LinearAlgebraicRepresentation.Cells)::Hpc
+	lar2exploded_hpc(V::Lar.Points,CV::Lar.Cells)::Hpc
 
 Input `V::Points` and `CV::Cells`. Output an *exploded* `Hpc`   
 object,  exploding cells in `CV` with scale `sx,sy,sz` parameters. 
@@ -477,21 +478,21 @@ used by `PLaSM` (Programming LAnguage for Solid Modeling).
 #	Example
 
 ```
-julia> V,cells = LinearAlgebraicRepresentation.cuboidGrid([3,3,1], true)
+julia> V,cells = Lar.cuboidGrid([3,3,1], true)
 
-julia> hpc = Plasm.lar2exploded_hpc(V::LinearAlgebraicRepresentation.Points, cells[4]::LinearAlgebraicRepresentation.Cells)()
+julia> hpc = Plasm.lar2exploded_hpc(V::Lar.Points, cells[4]::Lar.Cells)()
 
 julia> Plasm.view(hpc)
 ```
 """
-function lar2exploded_hpc(V::LinearAlgebraicRepresentation.Points, cells::LinearAlgebraicRepresentation.Cells)
+function lar2exploded_hpc(V::Lar.Points, cells::Lar.Cells)
 	function lar2exploded_hpc0(sx=1.2, sy=1.2, sz=1.2)
 		hpc = Plasm.hpc_exploded( (V,[cells]) )(sx,sy,sz)
 	end
 	return lar2exploded_hpc0
 end
 
-function viewexploded(V::LinearAlgebraicRepresentation.Points, cells::LinearAlgebraicRepresentation.Cells)
+function viewexploded(V::Lar.Points, cells::Lar.Cells)
 	function lar2exploded_hpc0(sx=1.2, sy=1.2, sz=1.2)
 		hpc = Plasm.hpc_exploded( (V,[cells]) )(sx,sy,sz)
 		Plasm.view(hpc)
