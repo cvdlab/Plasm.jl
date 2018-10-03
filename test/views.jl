@@ -1,3 +1,4 @@
+Lar = LinearAlgebraicRepresentation
 
 #p = PyCall.pyimport("pyplasm")
 #p_STRUCT = p["STRUCT"]
@@ -10,8 +11,8 @@
 	topol_1 = [[i,i+1] for i=1:2];
 	model_0 = (geom_0,topol_0);
 	model_1 = (geom_1,topol_1);
-	model_2 = LinearAlgebraicRepresentation.larModelProduct(model_0,model_1);
-	model_3 = LinearAlgebraicRepresentation.larModelProduct(model_2,model_0);
+	model_2 = Lar.larModelProduct(model_0,model_1);
+	model_3 = Lar.larModelProduct(model_2,model_0);
 	V,CV = model_3;
 	
 	@test typeof(V) == Array{Float64,2}

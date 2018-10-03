@@ -1,8 +1,6 @@
 using DataStructures
-using PyCall
-
 using LinearAlgebraicRepresentation
-using Plasm
+Lar = LinearAlgebraicRepresentation
 
 import Base.cat
 
@@ -20,16 +18,16 @@ Apply the `affineMatrix` parameter to the vertices of `larmodel`.
 # Example
 
 ```
-julia> square = LinearAlgebraicRepresentation.cuboid([1,1])
+julia> square = Lar.cuboid([1,1])
 ([0.0 0.0 1.0 1.0; 0.0 1.0 0.0 1.0], Array{Int64,1}[[1, 2, 3, 4]])
 
-julia> Plasm.apply(LinearAlgebraicRepresentation.t(1,2))(square)
+julia> Plasm.apply(Lar.t(1,2))(square)
 ([1.0 1.0 2.0 2.0; 2.0 3.0 2.0 3.0], Array{Int64,1}[[1, 2, 3, 4]])
 ```
 """
 function apply(affineMatrix)
 	function apply0(larmodel)
-		return L.struct2lar(L.Struct([ affineMatrix,larmodel ]))
+		return Lar.struct2lar(Lar.Struct([ affineMatrix,larmodel ]))
 	end
 	return apply0
 end
@@ -314,9 +312,9 @@ hpcs = [
 
 
 """
-ascii_LAR = DataStructures.OrderedDict{Int,LinearAlgebraicRepresentation.LAR}()
+ascii_LAR = DataStructures.OrderedDict{Int,Lar.LAR}()
 
-	ascii_LAR::{Int,LinearAlgebraicRepresentation.LAR}
+	ascii_LAR::{Int,Lar.LAR}
 
 *Ordered dictionary* of printable ASCII codes as one-dimensional *LAR models* in 2D.
 
@@ -401,8 +399,8 @@ julia> Plasm.view(model)
 ```
 """
 function text(mystring)
-	out = comp([ L.struct2lar, L.Struct, cat, distr,
-			cons([ charpols, k(L.t(fontspacing+fontwidth,0)) ]),charseq ])(mystring)
+	out = comp([ Lar.struct2lar, Lar.Struct, cat, distr,
+			cons([ charpols, k(Lar.t(fontspacing+fontwidth,0)) ]),charseq ])(mystring)
 	return out
 end
 
@@ -417,7 +415,7 @@ function a2a(mat)
 	function a2a0(models)
 		assembly = []
 		for model in models
-			push!( assembly, LinearAlgebraicRepresentation.Struct([ mat,model ]) )
+			push!( assembly, Lar.Struct([ mat,model ]) )
 		end
 		assembly
 	end
@@ -434,7 +432,7 @@ function translate(c)
 	function translate0(lar) 
 		xs = lar[1][1,:]
 		width = maximum(xs) - minimum(xs)
-		apply(LinearAlgebraicRepresentation.t(width/c,0))(lar)
+		apply(Lar.t(width/c,0))(lar)
 	end
 	return translate0
 end
@@ -485,16 +483,16 @@ function textWithAttributes(textalignment="centre", textangle=0,
 							textwidth=1.0, textheight=2.0, textspacing=0.25) 
 	function textWithAttributes(strand)
 		id = x->x
-		mat = LinearAlgebraicRepresentation.s(textwidth/fontwidth,textheight/fontheight)
+		mat = Lar.s(textwidth/fontwidth,textheight/fontheight)
 		comp([ 
-		   apply(LinearAlgebraicRepresentation.r(textangle)),
+		   apply(Lar.r(textangle)),
 		   align(textalignment),
-		   L.struct2lar,
-		   L.Struct,
+		   Lar.struct2lar,
+		   Lar.Struct,
 		   cat,
 		   distr,
 		   cons([ a2a(mat) ∘ charpols, 
-				k(LinearAlgebraicRepresentation.t(textwidth+textspacing,0)) ]),
+				k(Lar.t(textwidth+textspacing,0)) ]),
 		   charseq ])(strand)
 	end
 end
@@ -509,7 +507,7 @@ The embedding is done by adding ``d`` zero coordinates to each vertex.
 # Example
 
 ```
-julia> square = LinearAlgebraicRepresentation.cuboid([1,1])
+julia> square = Lar.cuboid([1,1])
 ([0.0 0.0 1.0 1.0; 0.0 1.0 0.0 1.0], Array{Int64,1}[[1, 2, 3, 4]])
 
 julia> embed(1)(square)
@@ -533,10 +531,10 @@ Different `colors` and size are used for the various dimensional cells.
 # Examples
 
 ```
-model = LinearAlgebraicRepresentation.cuboidGrid([3,4,2], true)
+model = Lar.cuboidGrid([3,4,2], true)
 Plasm.view(Plasm.numbering()(model)) 
 
-model = LinearAlgebraicRepresentation.cuboidGrid([10,10], true)
+model = Lar.cuboidGrid([10,10], true)
 Plasm.view(Plasm.numbering(1.5)(model))
 ```
 """ 
@@ -551,19 +549,19 @@ function numbering(numberSizeScaling=1)
 		gcode = Plasm.textWithAttributes("centre", 0, 0.1ns, 0.2ns, 0.025ns)
 		scene = [wireframe]
 		for (h,skel) in enumerate(cells)
-			colors = [p["GREEN"]",p["YELLOW"]",p["CYAN"]",p["ORANGE"]"]
+			colors = [p.GREEN, p.YELLOW, p.CYAN, p.ORANGE]
 			nums = []
 			for (k,cell) in enumerate(skel)
 				center = sum([V[:,v] for v in cell])/length(cell)
 				code = Plasm.embed(1)( gcode(string(k)) )
 				scaling = (0.6+0.1h,0.6+0.1h,1)
-				push!(nums, LinearAlgebraicRepresentation.struct2lar( LinearAlgebraicRepresentation.Struct([ 
-					LinearAlgebraicRepresentation.t(center...), LinearAlgebraicRepresentation.s(scaling...), code ]) ))
+				push!(nums, Lar.struct2lar( Lar.Struct([ 
+					Lar.t(center...), Lar.s(scaling...), code ]) ))
 			end
 			hpc = Plasm.lar2hpc(nums)
-			push!( scene, p["COLOR"](colors[h])(hpc) )
+			push!( scene, p.COLOR(colors[h])(hpc) )
 		end
-		p["STRUCT"]( scene )
+		p.STRUCT( scene )
 	end
 	return numbering0
 end
