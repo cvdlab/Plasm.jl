@@ -240,13 +240,9 @@ end
 # Example
 
 ```julia
-julia> V, (VV,EV,FV,CV) = Plasm.cuboidGrid([2,2,1],true);
+julia> V, (VV,EV,FV,CV) = Plasm.cuboidGrid([10,10,1],true);
 
-julia> copCV = Plasm.cuboidGrid([10,10,1],true);
-
-julia> copCV = Plasm.build_K(FV);
-
-julia> copCV = convert(SparseMatrixCSC{Int8,Int64},copCV);
+julia> copCV = convert(Plasm.ChainOp,Plasm.build_K(FV));
 
 julia> view(V,copCV)
 
