@@ -216,6 +216,48 @@ function view(V::Points, CV::Cells)
 end
 
 
+"""
+  build_K(FV::Lar.Cells)::ChainOp
+  
+The *characteristic matrix* of type `ChainOp` from 1-cells (edges) to 0-cells (vertices)
+"""
+function build_K(FV::Lar.Cells)
+	   I = Int64[]; J = Int64[]; V = Int64[]
+	   for (i,face) in enumerate(FV)
+			   for v in face
+					   push!(I,i)
+					   push!(J,v)
+					   push!(V,1)
+			   end
+	   end
+	   kEV = SparseArrays.sparse(I,J,V)
+end
+
+
+"""
+	view(V::Lar.Points, CV::Lar.ChainOp)
+	
+# Example
+
+```julia
+julia> V, (VV,EV,FV,CV) = Plasm.cuboidGrid([2,2,1],true);
+
+julia> copCV = Plasm.cuboidGrid([10,10,1],true);
+
+julia> copCV = Plasm.build_K(FV);
+
+julia> copCV = convert(SparseMatrixCSC{Int8,Int64},copCV);
+
+julia> view(V,copCV)
+
+```
+"""
+function view(V::Points, copCV::ChainOp)
+	CV = [findnz(copCV[k,:])[1] for k=1:size(copCV,1)]
+	view(V,CV)
+end
+
+
 
 """
 	view(model::LARmodel)
@@ -239,7 +281,7 @@ julia> Plasm.view( (V,[VV,EV,FV,CV]) )
 function view(model::LARmodel)
 	p = PyCall.pyimport("pyplasm")
 	hpc = hpc_exploded(model::LARmodel)(1.2,1.2,1.2)
-	p[""]VIEW(hpc)
+	p["VIEW"](hpc)
 end
 
 
@@ -267,7 +309,7 @@ function view(pair::Tuple{Points,Cells})
 	p = PyCall.pyimport("pyplasm")
 	V,CV = pair
 	hpc = lar2hpc(V::Points, CV::Cells)
-	p[""]VIEW(hpc)
+	p["VIEW"](hpc)
 end
 
 
@@ -325,7 +367,7 @@ Plasm.view(scene)
 function view(scene::Array{Any,1})
 	p = PyCall.pyimport("pyplasm")
 	if prod([isa(item[1:2],Lar.LAR) for item in scene])
-		p[""]VIEW(p[""]STRUCT([Plasm.lar2hpc(item[1],item[2]) for item in scene]))
+		p["VIEW"](p["STRUCT"]([Plasm.lar2hpc(item[1],item[2]) for item in scene]))
 	end
 end
 
@@ -364,11 +406,11 @@ function hpc_exploded( model )
 				py_verts = Plasm.points2py(vcell)
 				py_cells = Plasm.cells2py( [collect(1:size(vcell,2))] )
 				
-				hpc = p[""]MKPOL([ py_verts, py_cells, [] ])
+				hpc = p["MKPOL"]([ py_verts, py_cells, [] ])
 				push!(out, hpc)
 			end
 		end
-		hpc = p[""]STRUCT(out)
+		hpc = p["STRUCT"](out)
 		return hpc
 	end
 	return hpc_exploded0
@@ -459,7 +501,7 @@ Plasm.view(Plasm.lar2hpc(scene))
 """
 function lar2hpc(scene::Array{Any,1})::Hpc
 	p = PyCall.pyimport("pyplasm")
-	hpc = p[""]STRUCT([ mkpol(item[1],item[2]) for item in scene ])
+	hpc = p["STRUCT"]([ mkpol(item[1],item[2]) for item in scene ])
 end
 
 
