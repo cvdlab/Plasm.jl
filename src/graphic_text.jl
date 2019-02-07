@@ -1,10 +1,26 @@
 
 import Base.cat
-
-L = LinearAlgebraicRepresentation
+using LinearAlgebraicRepresentation
+Lar = LinearAlgebraicRepresentation
 
 View = Plasm.view
 	
+
+""" 
+	apply(affineMatrix::Matrix)
+
+Apply the `affineMatrix` parameter to the vertices of `larmodel`.
+
+# Example
+
+```
+julia> 
+```
+"""
+function apply(fun::Function, params::Array)
+	return fun(params)
+end
+
 
 """ 
 	apply(affineMatrix::Matrix)(larmodel::LAR)::LAR
@@ -23,7 +39,7 @@ julia> Plasm.apply(LinearAlgebraicRepresentation.t(1,2))(square)
 """
 function apply(affineMatrix)
 	function apply0(larmodel)
-		return L.struct2lar(L.Struct([ affineMatrix,larmodel ]))
+		return Lar.struct2lar(Lar.Struct([ affineMatrix,larmodel ]))
 	end
 	return apply0
 end
@@ -383,8 +399,8 @@ julia> Plasm.view(model)
 ```
 """
 function text(mystring)
-	out = comp([ L.struct2lar, L.Struct, cat, distr,
-			cons([ charpols, k(L.t(fontspacing+fontwidth,0)) ]),charseq ])(mystring)
+	out = comp([ Lar.struct2lar, Lar.Struct, cat, distr,
+			cons([ charpols, k(Lar.t(fontspacing+fontwidth,0)) ]),charseq ])(mystring)
 	return out
 end
 
@@ -471,8 +487,8 @@ function textWithAttributes(textalignment="centre", textangle=0,
 		comp([ 
 		   apply(LinearAlgebraicRepresentation.r(textangle)),
 		   align(textalignment),
-		   L.struct2lar,
-		   L.Struct,
+		   Lar.struct2lar,
+		   Lar.Struct,
 		   cat,
 		   distr,
 		   cons([ a2a(mat) ∘ charpols, 

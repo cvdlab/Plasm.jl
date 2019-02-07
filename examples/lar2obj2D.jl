@@ -17,7 +17,7 @@ L = LinearAlgebraicRepresentation
 using Plasm
 
 
-V,bases,coboundaries = L.chaincomplex(V,EV)
+V,bases,coboundaries = Lar.chaincomplex(V,EV)
 Plasm.view(V,bases[1])
 
 ev,fv=bases

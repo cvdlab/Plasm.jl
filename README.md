@@ -1,6 +1,6 @@
 # Plasm.jl
 
-Graphics module to visualize LinearAlgebraicRepresentation.jl structures via PyPLaSM.
+Graphics module to visualize [LinearAlgebraicRepresentation.jl](https://github.com/cvdlab/LinearAlgebraicRepresentation.jl) structures via PyPLaSM python package.
 
 ### Version
 0.1.0
@@ -18,6 +18,7 @@ Include the module (`using Plasm`).
 ## Authors
 * [Giorgio Scorzelli](https://github.com/plasm-language/pyplasm)
 * [Alberto Paoluzzi](https://github.com/apaoluzzi)
+* [Francesco Furiani](https://github.com/furio)
 
 ## How to contribute
 

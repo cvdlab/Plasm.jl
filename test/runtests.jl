@@ -1,5 +1,6 @@
-using Test
+using Base.Test
 using LinearAlgebraicRepresentation
+Lar = LinearAlgebraicRepresentation
 using DataStructures
 
 using PyCall
