@@ -1,4 +1,4 @@
-using Base.Test
+using Test
 using LinearAlgebraicRepresentation
 Lar = LinearAlgebraicRepresentation
 using DataStructures

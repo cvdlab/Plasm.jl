@@ -116,6 +116,8 @@ module Plasm
 	
 	
 
+   include("./fenvs.jl")
+
    include("./views.jl")
 
    include("./graphic_text.jl")
