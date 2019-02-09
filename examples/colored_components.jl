@@ -13,9 +13,10 @@ V,EVs = Lar.biconnectedComponent(model)
 EW = convert(Lar.Cells, cat(EVs))
 VV = [[k] for k=1:size(V,2)]
 
-color = p["COLOR"]
+#-----------------------------------------------------------
 Color4f = p["Color4f"]
-white = color(Color4f(1,1,1))
+
+color = p["COLOR"]
 
 colors = OrderedDict([
 "orange" => color(p["ORANGE"]),
@@ -30,14 +31,17 @@ colors = OrderedDict([
 "purple" => color(p["PURPLE"]),
 "gray" => color(p["GRAY"]),
 "brown" => color(p["BROWN"]) ])
+#-----------------------------------------------------------
+
+
 
 hpc = Plasm.lar2hpc(V,EW)
-cyan = color(p["CYAN"])
+cyan = colors["cyan"]
 out = cyan(hpc)
 Plasm.view( out )
 
-comps = [Plasm.lar2hpc(V,EV) for EV in EVs]::Array{Plasm.Hpc,1}
 colrs = collect(values(colors))::Array{PyObject,1}
+comps = [Plasm.lar2hpc(V,EV) for EV in EVs]::Array{Plasm.Hpc,1}
 
 Plasm.view(p["STRUCT"]([colrs[k](comps[k]) for k=1:length(comps)]))
 

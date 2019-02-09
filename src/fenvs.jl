@@ -218,7 +218,7 @@ julia> black = Color4f(1.0,1.0,1.0,1.0)
 PyObject Color4f(1.000000e+00,1.000000e+00,1.000000e+00,1.000000e+00)
 ```
 """
-const Color4f = p["Color4f"]
+Color4f = p["Color4f"]
 
 
 
@@ -244,7 +244,7 @@ julia> w = color(white)
 PyObject <function COLOR.<locals>.COLOR0 at 0x135dfcc80>
 ```
 """
-const color = p["COLOR"]
+color = p["COLOR"]
 
 
 
@@ -278,7 +278,7 @@ PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 'std::shared_ptr< Hpc
 julia> Plasm.view(green(hpc))
 ```
 """
-const colors = OrderedDict([
+colors = OrderedDict([
 "orange" => color(p["ORANGE"]),
 "red" => color(p["RED"]),
 "green" => color(p["GREEN"]),
@@ -291,5 +291,3 @@ const colors = OrderedDict([
 "purple" => color(p["PURPLE"]),
 "gray" => color(p["GRAY"]),
 "brown" => color(p["BROWN"]) ])
-
-white = color(Color4f(1,1,1))
