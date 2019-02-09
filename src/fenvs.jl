@@ -275,7 +275,7 @@ PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 'std::shared_ptr< Hpc
 julia> green(hpc)
 PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type 'std::shared_ptr< Hpc > *' at 0x12943c6c0> >
 
-julia> Plasm.view(green(hpc))
+julia> Plasm.view(Plasm.green(hpc))
 ```
 """
 colors = OrderedDict([

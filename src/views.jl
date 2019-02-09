@@ -542,13 +542,13 @@ end
 
 
 """
-	svg2lines(filename::String)::LAR
+	svg2lar(filename::String; normalize=true)::Lar.LAR
 
 Parse a SVG file to a `LAR` model `(V,EV)`.
 Only  `<line >` and `<rect >` SVG primitives are currently translated. 
 TODO:  interpretation of `<path >` and transformations.
 """
-function svg2lines(filename::String)::LAR
+function svg2lar(filename::String; normalize=true)::Lar.LAR
 	outlines = Array{Float64,1}[]
 	for line in eachline(filename)
 		parts = split(line, ' ')
@@ -592,10 +592,17 @@ function svg2lines(filename::String)::LAR
 		push!(EV, [v1,v2])
 	end
 	V = hcat(collect(keys(vertdict))...) 
-	ymax = maximum(V[2,:])
-	V[1,:] = V[1,:] .+ 0
-	V[2,:] = -V[2,:] .+ ymax
-	V = map( x->round(x,sigdigits=8), V )
+	
+	xmin = minimum(V[1,:]); ymin = minimum(V[2,:]); 
+	xmax = maximum(V[1,:]); ymax = maximum(V[2,:]); 
+	box = [[xmin; ymin] [xmax; ymax]]
+	if normalize
+		T = Lar.t(0,1) * Lar.s(1,-1) * Lar.s(1/(xmax-xmin), 1/(ymax-ymin)) * Lar.t(-xmin,-ymin) 
+	else
+		T = Lar.t(0, ymax-ymin) * Lar.s(1,-1)
+	end
+	W = T[1:2,:] * [V;ones(1,size(V,2))]
+	V = map( x->round(x,sigdigits=8), W )
 	return V,EV
 end
 
