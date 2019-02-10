@@ -1,6 +1,7 @@
-using PyCall
-@pyimport pyplasm as p
+using LinearAlgebraicRepresentation
 Lar = LinearAlgebraicRepresentation
+using PyCall
+p = PyCall.pyimport("pyplasm")
 
 """
 	cuboidGrid(shape::Array{Int64,1}[, full=false])::Union{LAR,LARmodel}
@@ -50,7 +51,7 @@ cuboidGrid = Lar.larCuboids
 
 
 """
-	centroid( V::Lar.Points )::Array{Float64,1}
+    centroid( V::Points )::Array{Float64,1}
 	
 *Geometric center* (or *barycenter*) of a `Points` 2-array of `size` ``(M,N)``. 
 
@@ -64,7 +65,7 @@ end
 
 
 """
-	centroid(V::Lar.Points)::Array{Float64,1}
+  centroid(V::Array{Float64,2})::Array{Float64,1}
 	
 *Geometric center* of a `Points` 2-array of `size` ``(M,N)``. Each of the 
 ``M`` coordinates of *barycenter* of the dense array of ``N`` `points` is the *mean*
@@ -150,7 +151,7 @@ PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type
 function mkpol( verts::Plasm.Points, cells::Plasm.Cells )::Plasm.Hpc
 	Verts = Plasm.points2py(verts)
 	Cells = Plasm.cells2py(cells)
-	Mkpol = p.MKPOL
+	Mkpol = p["MKPOL"]
 	return Mkpol(PyVector([Verts,Cells,[]]))
 end
 
@@ -181,7 +182,7 @@ julia> Plasm.view(hpc)
 ``` 
 """
 function view(hpc::Plasm.Hpc)
-		p.VIEW(hpc)
+	p["VIEW"](hpc)
 end
 
 
@@ -209,8 +210,46 @@ Plasm.view(Plasm.mkpol(V,CV))
 ```
 """
 function view(V::Points, CV::Cells)
-		hpc = lar2hpc(V::Points, CV::Cells)
-	p.VIEW(hpc)
+	hpc = lar2hpc(V::Points, CV::Cells)
+	p["VIEW"](hpc)
+end
+
+
+"""
+  build_K(FV::Lar.Cells)::ChainOp
+  
+The *characteristic matrix* of type `ChainOp` from 1-cells (edges) to 0-cells (vertices)
+"""
+function build_K(FV::Lar.Cells)
+	   I = Int64[]; J = Int64[]; V = Int64[]
+	   for (i,face) in enumerate(FV)
+			   for v in face
+					   push!(I,i)
+					   push!(J,v)
+					   push!(V,1)
+			   end
+	   end
+	   kEV = SparseArrays.sparse(I,J,V)
+end
+
+
+"""
+	view(V::Lar.Points, CV::Lar.ChainOp)
+	
+# Example
+
+```julia
+julia> V, (VV,EV,FV,CV) = Plasm.cuboidGrid([10,10,1],true);
+
+julia> copCV = convert(Plasm.ChainOp,Plasm.build_K(FV));
+
+julia> view(V,copCV)
+
+```
+"""
+function view(V::Points, copCV::ChainOp)
+	CV = [findnz(copCV[k,:])[1] for k=1:size(copCV,1)]
+	view(V,CV)
 end
 
 
@@ -235,8 +274,8 @@ julia> Plasm.view( (V,[VV,EV,FV,CV]) )
 ```
 """
 function view(model::LARmodel)
-		hpc = hpc_exploded(model::LARmodel)(1.2,1.2,1.2)
-	p.VIEW(hpc)
+	hpc = hpc_exploded(model::LARmodel)(1.2,1.2,1.2)
+	p["VIEW"](hpc)
 end
 
 
@@ -261,9 +300,9 @@ julia> Plasm.view( (V,FV) );
 ```
 """
 function view(pair::Tuple{Points,Cells})
-		V,CV = pair
+	V,CV = pair
 	hpc = lar2hpc(V::Points, CV::Cells)
-	p.VIEW(hpc)
+	p["VIEW"](hpc)
 end
 
 
@@ -319,8 +358,8 @@ Plasm.view(scene)
 ```
 """
 function view(scene::Array{Any,1})
-		if prod([isa(item[1:2],Lar.LAR) for item in scene])
-		p.VIEW(p.STRUCT([Plasm.lar2hpc(item[1],item[2]) for item in scene]))
+	if prod([isa(item[1:2],Lar.LAR) for item in scene])
+		p["VIEW"](p["STRUCT"]([Plasm.lar2hpc(item[1],item[2]) for item in scene]))
 	end
 end
 
@@ -358,11 +397,11 @@ function hpc_exploded( model )
 				py_verts = Plasm.points2py(vcell)
 				py_cells = Plasm.cells2py( [collect(1:size(vcell,2))] )
 				
-				hpc = p.MKPOL([ py_verts, py_cells, [] ])
+				hpc = p["MKPOL"]([ py_verts, py_cells, [] ])
 				push!(out, hpc)
 			end
 		end
-		hpc = p.STRUCT(out)
+		hpc = p["STRUCT"](out)
 		return hpc
 	end
 	return hpc_exploded0
@@ -452,7 +491,7 @@ Plasm.view(Plasm.lar2hpc(scene))
 
 """
 function lar2hpc(scene::Array{Any,1})::Hpc
-		hpc = p.STRUCT([ mkpol(item[1],item[2]) for item in scene ])
+	hpc = p["STRUCT"]([ mkpol(item[1],item[2]) for item in scene ])
 end
 
 
@@ -495,4 +534,67 @@ function viewexploded(V::Lar.Points, cells::Lar.Cells)
 end
 
 
+"""
+	svg2lar(filename::String; normalize=true)::Lar.LAR
 
+Parse a SVG file to a `LAR` model `(V,EV)`.
+Only  `<line >` and `<rect >` SVG primitives are currently translated. 
+TODO:  interpretation of `<path >` and transformations.
+"""
+function svg2lar(filename::String; normalize=true)::Lar.LAR
+	outlines = Array{Float64,1}[]
+	for line in eachline(filename)
+		parts = split(line, ' ')
+		# SVG <line > primitives
+		if parts[1] == "<line"
+			regex = r"""(<line )(.+)(" x1=")(.+)(" y1=")(.+)(" x2=")(.+)(" y2=")(.+)("/>)"""
+			coords = collect(match( regex , line)[k] for k in (4,6,8,10))
+			outline = [ parse(Float64, string) for string in coords ]
+			push!(outlines, outline)
+		# SVG <rect > primitives
+		elseif parts[1] == "<rect"
+			regex = r"""(<rect x=")(.+?)(" y=")(.+?)(" )(.*?)( width=")(.+?)(" height=")(.+?)("/>)"""
+			coords = collect(match( regex , line)[k] for k in (2,4,8,10))
+			x, y, width, height = [ parse(Float64, string) for string in coords ]
+			line1 = [ x, y, x+width, y ]
+			line2 = [ x, y, x, y+height ]
+			line3 = [ x+width, y, x+width, y+height ]
+			line4 = [ x, y+height, x+width, y+height ]
+			push!(outlines, line1, line2, line3, line4)
+		# SVG <rect > primitives (TODO)
+		# see https://github.com/regebro/svg.path
+		end
+	end
+	lines = hcat(outlines...)
+	lines = map( x->round(x,sigdigits=8), lines )
+	vertdict = OrderedDict{Array{Float64,1}, Int64}()
+	EV = Array{Int64,1}[]
+	idx = 0
+	for h=1:size(lines,2)
+		x1,y1,x2,y2 = lines[:,h]
+		
+		if ! haskey(vertdict, [x1,y1])
+			idx += 1
+			vertdict[[x1,y1]] = idx
+		end
+		if ! haskey(vertdict, [x2,y2])
+			idx += 1
+			vertdict[[x2,y2]] = idx
+		end
+		v1,v2 = vertdict[[x1,y1]],vertdict[[x2,y2]]
+		push!(EV, [v1,v2])
+	end
+	V = hcat(collect(keys(vertdict))...) 
+	
+	xmin = minimum(V[1,:]); ymin = minimum(V[2,:]); 
+	xmax = maximum(V[1,:]); ymax = maximum(V[2,:]); 
+	box = [[xmin; ymin] [xmax; ymax]]
+	if normalize
+		T = Lar.t(0,1) * Lar.s(1,-1) * Lar.s(1/(xmax-xmin), 1/(ymax-ymin)) * Lar.t(-xmin,-ymin) 
+	else
+		T = Lar.t(0, ymax-ymin) * Lar.s(1,-1)
+	end
+	W = T[1:2,:] * [V;ones(1,size(V,2))]
+	V = map( x->round(x,sigdigits=8), W )
+	return V,EV
+end

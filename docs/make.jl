@@ -7,7 +7,7 @@ makedocs(
 	sitename = "Plasm.jl",
 	pages = [
 		"Home" => "index.md",
-		"Visualization" => "larview.md",
+		"Visualization" => "plasm.md",
 		"Numbering" => "numbering.md",
 		"Glossary" => "glossary.md"
 	]

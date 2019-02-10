@@ -1,4 +1,4 @@
-
+using Test
 
 @testset "mini-FL Tests" begin
    @testset "comp" begin
@@ -170,7 +170,3 @@ end
 	@test Plasm.translate(-1)(Lar.cuboid([1,1]))==
 	([-1.0 -1.0 0.0 0.0; 0.0 1.0 0.0 1.0], Array{Int64,1}[[1, 2, 3, 4]])
 end
-
-
-
-

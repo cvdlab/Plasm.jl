@@ -4,11 +4,11 @@ module Plasm
 	#export centroid, cuboidGrid, mkpol, view, hpc_exploded, lar2hpc
 
 	using LinearAlgebraicRepresentation
+	Lar = LinearAlgebraicRepresentation
 	using DataStructures
+	using SparseArrays
 	using PyCall
-
-	@pyimport pyplasm as p
-	
+	p = pyimport("pyplasm")
 	import Base.view
 
 
@@ -109,10 +109,8 @@ module Plasm
 	"""
 	const Hpc = PyCall.PyObject
 
-
 	
-	
-
+   include("./fenvs.jl")
    include("./views.jl")
    include("./graphic_text.jl")
 

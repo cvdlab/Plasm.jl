@@ -1,14 +1,9 @@
 using DataStructures
 using LinearAlgebraicRepresentation
 Lar = LinearAlgebraicRepresentation
-
 import Base.cat
 
-
-L = LinearAlgebraicRepresentation
-
-View = Plasm.view
-	
+View = Plasm.view	
 
 """ 
 	apply(affineMatrix::Matrix)(larmodel::LAR)::LAR
@@ -191,8 +186,6 @@ function distl(args)
 end
 
 
-
-
 # Vector definition of printable ASCII codes as one-dimensional LAR models.
 # Font design for *Geometric Programming for Computer-Aided Design*, Wiley, 2003. 
 
@@ -330,7 +323,7 @@ julia> Plasm.ascii_LAR[126]
 ([1.0 1.75 2.75 3.5; 5.0 5.5 5.0 5.5], Array{Int64,1}[[1, 2], [2, 3], [3, 4]])
 ```
 """
-ascii_LAR = OrderedDict(zip(32:126,Plasm.hpcs))
+ascii_LAR = DataStructures.OrderedDict(zip(32:126,Plasm.hpcs))
 
 
 
@@ -461,7 +454,7 @@ end
 Redefined locally, as service to `textWithAttributes` implementation.
 """
 function cat(args)
-	return reduce( (x,y) -> append!(x,y), [], args )
+	return reduce( (x,y) -> append!(x,y), args; init=[] )
 end
 
 
@@ -510,7 +503,7 @@ The embedding is done by adding ``d`` zero coordinates to each vertex.
 julia> square = Lar.cuboid([1,1])
 ([0.0 0.0 1.0 1.0; 0.0 1.0 0.0 1.0], Array{Int64,1}[[1, 2, 3, 4]])
 
-julia> embed(1)(square)
+julia> Plasm.embed(1)(square)
 ([0.0 0.0 1.0 1.0; 0.0 1.0 0.0 1.0; 0.0 0.0 0.0 0.0], Array{Int64,1}[[1, 2, 3, 4]])
 ```
 """
@@ -539,6 +532,7 @@ Plasm.view(Plasm.numbering(1.5)(model))
 ```
 """ 
 function numbering(numberSizeScaling=1) 
+	p = PyCall.pyimport("pyplasm")
 	function numbering0(model) 
 		V,cells = model
 		if size(V,1)==2 
@@ -549,9 +543,9 @@ function numbering(numberSizeScaling=1)
 		gcode = Plasm.textWithAttributes("centre", 0, 0.1ns, 0.2ns, 0.025ns)
 		scene = [wireframe]
 		for (h,skel) in enumerate(cells)
-			colors = [p.GREEN, p.YELLOW, p.CYAN, p.ORANGE]
-			nums = []
-			for (k,cell) in enumerate(skel)
+			  colors = [p["GREEN"], p["YELLOW"], p["CYAN"], p["ORANGE"]]
+		 	  nums = []
+			  for (k,cell) in enumerate(skel)
 				center = sum([V[:,v] for v in cell])/length(cell)
 				code = Plasm.embed(1)( gcode(string(k)) )
 				scaling = (0.6+0.1h,0.6+0.1h,1)
@@ -559,13 +553,9 @@ function numbering(numberSizeScaling=1)
 					Lar.t(center...), Lar.s(scaling...), code ]) ))
 			end
 			hpc = Plasm.lar2hpc(nums)
-			push!( scene, p.COLOR(colors[h])(hpc) )
+			push!( scene, p["COLOR"](colors[h])(hpc) )
 		end
-		p.STRUCT( scene )
+		p["STRUCT"]( scene )
 	end
 	return numbering0
 end
-
-
-
-
