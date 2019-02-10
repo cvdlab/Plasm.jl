@@ -1,9 +1,189 @@
-
-import Base.cat
+using DataStructures
 using LinearAlgebraicRepresentation
 Lar = LinearAlgebraicRepresentation
+import Base.cat
 
-View = Plasm.view
+View = Plasm.view	
+
+""" 
+	apply(affineMatrix::Matrix)(larmodel::LAR)::LAR
+
+Apply the `affineMatrix` parameter to the vertices of `larmodel`.
+
+# Example
+
+```
+julia> square = Lar.cuboid([1,1])
+([0.0 0.0 1.0 1.0; 0.0 1.0 0.0 1.0], Array{Int64,1}[[1, 2, 3, 4]])
+
+julia> Plasm.apply(Lar.t(1,2))(square)
+([1.0 1.0 2.0 2.0; 2.0 3.0 2.0 3.0], Array{Int64,1}[[1, 2, 3, 4]])
+```
+"""
+function apply(affineMatrix)
+	function apply0(larmodel)
+		return Lar.struct2lar(Lar.Struct([ affineMatrix,larmodel ]))
+	end
+	return apply0
+end
+
+
+
+""" 
+	comp(funs::Array)
+
+Standard mathematical composition. 
+
+Pipe execution from right to left on application to actual parameter.
+"""
+function comp(funs)
+    function compose(f,g)
+	  return x -> f(g(x))
+	end
+    id = x->x
+    return reduce(compose, id, funs)
+end
+
+
+
+"""
+	cons(funs::Array)(x::Any)::Array
+
+*Construction* functional of FL and PLaSM languages.
+
+Provides a *vector* functional that returns the array of 
+applications of component functions to actual parameter.
+
+# Example 
+
+```
+julia> Plasm.cons([cos,sin])(0)
+2-element Array{Float64,1}:
+ 1.0
+ 0.0
+```
+"""
+function cons(funs)
+	return x -> [f(x) for f in funs]
+end
+
+
+
+""" 
+	k(Any)(x)
+
+*Constant* functional of FL and PLaSM languages.
+
+Gives a constant functional that always returns the actual parameter
+when applied to another parameter.
+
+#	Examples
+
+```
+julia> Plasm.k(10)(100)
+10
+
+julia> Plasm.k(sin)(cos)
+sin
+```
+"""
+function k(Any)
+	x->Any
+end
+
+
+""" 
+	aa(fun::Function)(args::Array)::Array
+
+AA applies fun to each element of the args sequence 
+
+# Example 
+
+```
+julia> Plasm.aa(sqrt)([1,4,9,16])
+4-element Array{Float64,1}:
+ 1.0
+ 2.0
+ 3.0
+ 4.0
+```
+"""
+function aa(fun)
+	function aa1(args::Array)
+		map(fun,args)
+	end
+	return aa1
+end
+
+
+
+""" 
+	id(x::Anytype)
+
+Identity function.  Return the argument.
+
+"""
+id = x->x
+
+
+
+	
+""" 
+	distr(args::Union{Tuple,Array})::Array
+
+Distribute right. The parameter `args` must contain a `list` and an element `x`. 
+Return the `pair` array with the elements of `args` coupled with `x`
+
+# Example 
+
+```
+julia> Plasm.distr(([1,2,3],10))
+3-element Array{Array{Int64,1},1}:
+ [1, 10]
+ [2, 10]
+ [3, 10]
+
+julia> Plasm.distr([[1,2,3],10])
+3-element Array{Array{Int64,1},1}:
+ [1, 10]
+ [2, 10]
+ [3, 10]
+```
+"""
+function distr(args)
+	list,element = args
+	return [ [e,element] for e in list ]
+end
+
+
+
+	
+""" 
+	distl(args::Union{Tuple,Array})::Array
+
+Distribute right. The parameter `args` must contain an element `x` and a `list`. 
+Return the `pair` array with `x` coupled with the elements of `args`. 
+
+# Example 
+
+```
+julia> Plasm.distl((10, [1,2,3]))
+3-element Array{Array{Int64,1},1}:
+ [10, 1]
+ [10, 2]
+ [10, 3]
+
+julia> Plasm.distl([10, [1,2,3]])
+3-element Array{Array{Int64,1},1}:
+ [10, 1]
+ [10, 2]
+ [10, 3]
+```
+"""
+function distl(args)
+	element, list = args
+	return [ [element, e] for e in list ]
+end
 
 
 # Vector definition of printable ASCII codes as one-dimensional LAR models.
@@ -125,9 +305,9 @@ hpcs = [
 
 
 """
-ascii_LAR = DataStructures.OrderedDict{Int,LinearAlgebraicRepresentation.LAR}()
+ascii_LAR = DataStructures.OrderedDict{Int,Lar.LAR}()
 
-	ascii_LAR::{Int,LinearAlgebraicRepresentation.LAR}
+	ascii_LAR::{Int,Lar.LAR}
 
 *Ordered dictionary* of printable ASCII codes as one-dimensional *LAR models* in 2D.
 
@@ -228,7 +408,7 @@ function a2a(mat)
 	function a2a0(models)
 		assembly = []
 		for model in models
-			push!( assembly, LinearAlgebraicRepresentation.Struct([ mat,model ]) )
+			push!( assembly, Lar.Struct([ mat,model ]) )
 		end
 		assembly
 	end
@@ -245,7 +425,7 @@ function translate(c)
 	function translate0(lar) 
 		xs = lar[1][1,:]
 		width = maximum(xs) - minimum(xs)
-		apply(LinearAlgebraicRepresentation.t(width/c,0))(lar)
+		apply(Lar.t(width/c,0))(lar)
 	end
 	return translate0
 end
@@ -296,16 +476,16 @@ function textWithAttributes(textalignment="centre", textangle=0,
 							textwidth=1.0, textheight=2.0, textspacing=0.25) 
 	function textWithAttributes(strand)
 		id = x->x
-		mat = LinearAlgebraicRepresentation.s(textwidth/fontwidth,textheight/fontheight)
+		mat = Lar.s(textwidth/fontwidth,textheight/fontheight)
 		comp([ 
-		   apply(LinearAlgebraicRepresentation.r(textangle)),
+		   apply(Lar.r(textangle)),
 		   align(textalignment),
 		   Lar.struct2lar,
 		   Lar.Struct,
 		   cat,
 		   distr,
 		   cons([ a2a(mat) ∘ charpols, 
-				k(LinearAlgebraicRepresentation.t(textwidth+textspacing,0)) ]),
+				k(Lar.t(textwidth+textspacing,0)) ]),
 		   charseq ])(strand)
 	end
 end
@@ -320,7 +500,7 @@ The embedding is done by adding ``d`` zero coordinates to each vertex.
 # Example
 
 ```
-julia> square = LinearAlgebraicRepresentation.cuboid([1,1])
+julia> square = Lar.cuboid([1,1])
 ([0.0 0.0 1.0 1.0; 0.0 1.0 0.0 1.0], Array{Int64,1}[[1, 2, 3, 4]])
 
 julia> Plasm.embed(1)(square)
@@ -344,10 +524,10 @@ Different `colors` and size are used for the various dimensional cells.
 # Examples
 
 ```
-model = LinearAlgebraicRepresentation.cuboidGrid([3,4,2], true)
+model = Lar.cuboidGrid([3,4,2], true)
 Plasm.view(Plasm.numbering()(model)) 
 
-model = LinearAlgebraicRepresentation.cuboidGrid([10,10], true)
+model = Lar.cuboidGrid([10,10], true)
 Plasm.view(Plasm.numbering(1.5)(model))
 ```
 """ 
@@ -363,14 +543,14 @@ function numbering(numberSizeScaling=1)
 		gcode = Plasm.textWithAttributes("centre", 0, 0.1ns, 0.2ns, 0.025ns)
 		scene = [wireframe]
 		for (h,skel) in enumerate(cells)
-			colors = [p["GREEN"], p["YELLOW"], p["CYAN"], p["ORANGE"]]
-			nums = []
-			for (k,cell) in enumerate(skel)
+			  colors = [p["GREEN"], p["YELLOW"], p["CYAN"], p["ORANGE"]]
+		 	  nums = []
+			  for (k,cell) in enumerate(skel)
 				center = sum([V[:,v] for v in cell])/length(cell)
 				code = Plasm.embed(1)( gcode(string(k)) )
 				scaling = (0.6+0.1h,0.6+0.1h,1)
-				push!(nums, LinearAlgebraicRepresentation.struct2lar( LinearAlgebraicRepresentation.Struct([ 
-					LinearAlgebraicRepresentation.t(center...), LinearAlgebraicRepresentation.s(scaling...), code ]) ))
+				push!(nums, Lar.struct2lar( Lar.Struct([ 
+					Lar.t(center...), Lar.s(scaling...), code ]) ))
 			end
 			hpc = Plasm.lar2hpc(nums)
 			push!( scene, p["COLOR"](colors[h])(hpc) )
@@ -379,7 +559,3 @@ function numbering(numberSizeScaling=1)
 	end
 	return numbering0
 end
-
-
-
-

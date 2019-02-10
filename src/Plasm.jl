@@ -8,9 +8,7 @@ module Plasm
 	using DataStructures
 	using SparseArrays
 	using PyCall
-
 	p = pyimport("pyplasm")
-	
 	import Base.view
 
 
@@ -111,15 +109,9 @@ module Plasm
 	"""
 	const Hpc = PyCall.PyObject
 
-
 	
-	
-	
-
    include("./fenvs.jl")
-
    include("./views.jl")
-
    include("./graphic_text.jl")
 
 end # module
