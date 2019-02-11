@@ -53,7 +53,7 @@ cuboidGrid = Lar.larCuboids
 
 
 """
-	centroid( V::Points )::Array{Float64,1}
+    centroid( V::Points )::Array{Float64,1}
 	
 *Geometric center* (or *barycenter*) of a `Points` 2-array of `size` ``(M,N)``. 
 
@@ -67,7 +67,7 @@ end
 
 
 """
-	centroid(V::Array{Float64,2})::Array{Float64,1}
+  centroid(V::Array{Float64,2})::Array{Float64,1}
 	
 *Geometric center* of a `Points` 2-array of `size` ``(M,N)``. Each of the 
 ``M`` coordinates of *barycenter* of the dense array of ``N`` `points` is the *mean*
@@ -151,7 +151,6 @@ PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type
 	```
 """
 function mkpol( verts::Plasm.Points, cells::Plasm.Cells )::Plasm.Hpc
-	p = PyCall.pyimport("pyplasm")
 	Verts = Plasm.points2py(verts)
 	Cells = Plasm.cells2py(cells)
 	hpc = p["MKPOL"]([Verts,Cells,PyObject(true)])
@@ -188,7 +187,7 @@ at 0x140d6c780> >
 julia> Plasm.view(hpc)
 ``` 
 """
-function view(hpc)
+function view(hpc::Plasm.Hpc)
 	p = PyCall.pyimport("pyplasm")
 	p["VIEW"](hpc)
 end
@@ -218,7 +217,6 @@ Plasm.view(Plasm.mkpol(V,CV))
 ```
 """
 function view(V::Points, CV::Cells)
-	p = PyCall.pyimport("pyplasm")
 	hpc = lar2hpc(V::Points, CV::Cells)
 	p["VIEW"](hpc)
 end
@@ -283,7 +281,6 @@ julia> Plasm.view( (V,[VV,EV,FV,CV]) )
 ```
 """
 function view(model::LARmodel)
-	p = PyCall.pyimport("pyplasm")
 	hpc = hpc_exploded(model::LARmodel)(1.2,1.2,1.2)
 	p["VIEW"](hpc)
 end
@@ -310,7 +307,6 @@ julia> Plasm.view( (V,FV) );
 ```
 """
 function view(pair::Tuple{Points,Cells})
-	p = PyCall.pyimport("pyplasm")
 	V,CV = pair
 	hpc = lar2hpc(V::Points, CV::Cells)
 	p["VIEW"](hpc)
@@ -369,7 +365,6 @@ Plasm.view(scene)
 ```
 """
 function view(scene::Array{Any,1})
-	p = PyCall.pyimport("pyplasm")
 	if prod([isa(item[1:2],Lar.LAR) for item in scene])
 		p["VIEW"](p["STRUCT"]([Plasm.lar2hpc(item[1],item[2]) for item in scene]))
 	end
@@ -393,8 +388,7 @@ julia> view(hpc)
 ```
 """
 function hpc_exploded( model )
-	p = PyCall.pyimport("pyplasm")
-	function hpc_exploded0( sx=1.2, sy=1.2, sz=1.2 )
+		function hpc_exploded0( sx=1.2, sy=1.2, sz=1.2 )
 		verts,cells = model
 		out = []
 		for skeleton in cells
@@ -505,7 +499,6 @@ Plasm.view(Plasm.lar2hpc(scene))
 
 """
 function lar2hpc(scene::Array{Any,1})::Hpc
-	p = PyCall.pyimport("pyplasm")
 	hpc = p["STRUCT"]([ mkpol(item[1],item[2]) for item in scene ])
 end
 
@@ -547,7 +540,6 @@ function viewexploded(V::Lar.Points, cells::Lar.Cells)
 	end
 	return lar2exploded_hpc0
 end
-
 
 
 """
@@ -614,4 +606,3 @@ function svg2lar(filename::String; normalize=true)::Lar.LAR
 	V = map( x->round(x,sigdigits=8), W )
 	return V,EV
 end
-

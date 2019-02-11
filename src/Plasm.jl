@@ -112,43 +112,6 @@ current `Python` library [*https://github.com/plasm-language/pyplasm*]
 const Hpc = PyCall.PyObject
 
 
-#---------------------------------------------------------
-# COLOR
-#---------------------------------------------------------
-
-
-#""" 
-#	const Color4f
-#	
-#`PyObject` <class 'pyplasm.xgepy.Color4f'>
-#
-#Color value `(R,G,B,A)`, Red, Green, Blue, Alpha, 
-#with `0.0 ≤ R,G,B,A ≤ 1.0`. Quadruple of Float numbers 
-#
-## Example
-#
-#```julia
-#using PyCall
-#p = PyCall.pyimport("pyplasm")
-#
-#julia> black = Color4f(0,0,0,1)
-## PyObject Color4f(0.000000e+00,0.000000e+00,0.000000e+00,1.000000e+00)
-#
-#julia> black = Color4f(1.0,1.0,1.0,1.0)
-## PyObject Color4f(1.000000e+00,1.000000e+00,1.000000e+00,1.000000e+00)
-#```
-#"""
-#p = PyCall.pyimport("pyplasm")
-#const Color4f = p["Color4f"]
-
-
-#
-#function colors(keys::Array{String,1})::Array{String,1}
-#	p = PyCall.pyimport("pyplasm")
-#	return PyObject[color(key) for key in colors]
-#end
-#
-
 
 
 """ 
