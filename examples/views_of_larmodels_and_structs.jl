@@ -1,5 +1,5 @@
 using LinearAlgebraicRepresentation
-L = LinearAlgebraicRepresentation
+Lar = LinearAlgebraicRepresentation
 
 using Plasm
 View = Plasm.view

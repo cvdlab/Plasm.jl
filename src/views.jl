@@ -1,4 +1,8 @@
+using LinearAlgebraicRepresentation
 Lar = LinearAlgebraicRepresentation
+using PyCall
+p = PyCall.pyimport("pyplasm")
+import Base.view
 
 
 """
@@ -150,15 +154,19 @@ function mkpol( verts::Plasm.Points, cells::Plasm.Cells )::Plasm.Hpc
 	p = PyCall.pyimport("pyplasm")
 	Verts = Plasm.points2py(verts)
 	Cells = Plasm.cells2py(cells)
-	Mkpol = p["MKPOL"]
-	return Mkpol(PyVector([Verts,Cells,[]]))
+	hpc = p["MKPOL"]([Verts,Cells,PyObject(true)])
+	return hpc
+end
+function mkpol( hpcs::Array{Plasm.Hpc,1} )::Plasm.Hpc
+	p = PyCall.pyimport("pyplasm")
+	return p["MKPOL"](PyCall.PyVector(hpcs))
 end
 
 
 
 
 """
-	view(hpc::Plasm.Hpc)
+	view(hpc::PyObject)
 	
 Base.view extension. 
 Display a *Python*  `HPC` (Hierarchica Polyhedral Complex) `object` using 
@@ -180,7 +188,7 @@ at 0x140d6c780> >
 julia> Plasm.view(hpc)
 ``` 
 """
-function view(hpc::Plasm.Hpc)
+function view(hpc)
 	p = PyCall.pyimport("pyplasm")
 	p["VIEW"](hpc)
 end
@@ -437,7 +445,8 @@ julia> view(hpc)
 ```
 """
 function lar2hpc(V::Points, CV::Cells)::Hpc
-	hpc = mkpol(V,CV)
+	hpc = Plasm.mkpol(V,CV)
+	return hpc
 end
 
 

@@ -5,6 +5,7 @@ using DataStructures
 using PyCall
 p = PyCall.pyimport("pyplasm")
 
+
 filename = "/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/boundarytest2.svg"
 V, EV = Plasm.svg2lar(filename)
 Plasm.view(Plasm.numbering(.2)((V,[[[k] for k=1:size(V,2)], EV])))
