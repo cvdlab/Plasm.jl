@@ -218,6 +218,7 @@ Plasm.view(Plasm.mkpol(V,CV))
 ```
 """
 function view(V::Points, CV::Cells)
+	p = PyCall.pyimport("pyplasm")
 	hpc = lar2hpc(V::Points, CV::Cells)
 	p["VIEW"](hpc)
 end

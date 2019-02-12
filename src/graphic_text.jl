@@ -5,9 +5,9 @@ import Base.cat
 
 View = Plasm.view	
 
-
+# Graphic text font implementation
 # Vector definition of printable ASCII codes as one-dimensional LAR models.
-# Font design for *Geometric Programming for Computer-Aided Design*, Wiley, 2003. 
+# Font design from *Geometric Programming for Computer-Aided Design*, Wiley, 2003. 
 
 ascii32 = ([0.0; 0.0],Array{Int64,1}[[1]])
 ascii33 = ([1.75 1.75 2.0 2.0 1.5 1.5; 1.75 5.5 0.5 1.0 1.0 0.5],Array{Int64,1}[[1,2],[3,4],[4,5],[5,6],[6,3]])
