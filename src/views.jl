@@ -151,6 +151,7 @@ PyObject <pyplasm.xgepy.Hpc; proxy of <Swig Object of type
 	```
 """
 function mkpol( verts::Plasm.Points, cells::Plasm.Cells )::Plasm.Hpc
+	p = PyCall.pyimport("pyplasm")
 	Verts = Plasm.points2py(verts)
 	Cells = Plasm.cells2py(cells)
 	hpc = p["MKPOL"]([Verts,Cells,PyObject(true)])
@@ -281,6 +282,7 @@ julia> Plasm.view( (V,[VV,EV,FV,CV]) )
 ```
 """
 function view(model::LARmodel)
+	p = PyCall.pyimport("pyplasm")
 	hpc = hpc_exploded(model::LARmodel)(1.2,1.2,1.2)
 	p["VIEW"](hpc)
 end
@@ -308,6 +310,7 @@ julia> Plasm.view( (V,FV) );
 """
 function view(pair::Tuple{Points,Cells})
 	V,CV = pair
+	p = PyCall.pyimport("pyplasm")
 	hpc = lar2hpc(V::Points, CV::Cells)
 	p["VIEW"](hpc)
 end
@@ -366,6 +369,7 @@ Plasm.view(scene)
 """
 function view(scene::Array{Any,1})
 	if prod([isa(item[1:2],Lar.LAR) for item in scene])
+		p = PyCall.pyimport("pyplasm")
 		p["VIEW"](p["STRUCT"]([Plasm.lar2hpc(item[1],item[2]) for item in scene]))
 	end
 end
@@ -388,7 +392,8 @@ julia> view(hpc)
 ```
 """
 function hpc_exploded( model )
-		function hpc_exploded0( sx=1.2, sy=1.2, sz=1.2 )
+		function hpc_exploded0( sx=1.2, sy=1.2, sz=1.2 )	
+		p = PyCall.pyimport("pyplasm")
 		verts,cells = model
 		out = []
 		for skeleton in cells
@@ -499,6 +504,7 @@ Plasm.view(Plasm.lar2hpc(scene))
 
 """
 function lar2hpc(scene::Array{Any,1})::Hpc
+	p = PyCall.pyimport("pyplasm")
 	hpc = p["STRUCT"]([ mkpol(item[1],item[2]) for item in scene ])
 end
 
@@ -575,6 +581,7 @@ function svg2lar(filename::String; normalize=true)::Lar.LAR
 	end
 	lines = hcat(outlines...)
 	lines = map( x->round(x,sigdigits=8), lines )
+	# LAR model construction
 	vertdict = OrderedDict{Array{Float64,1}, Int64}()
 	EV = Array{Int64,1}[]
 	idx = 0
@@ -593,12 +600,21 @@ function svg2lar(filename::String; normalize=true)::Lar.LAR
 		push!(EV, [v1,v2])
 	end
 	V = hcat(collect(keys(vertdict))...) 
-	
+	# normalization 
 	xmin = minimum(V[1,:]); ymin = minimum(V[2,:]); 
 	xmax = maximum(V[1,:]); ymax = maximum(V[2,:]); 
 	box = [[xmin; ymin] [xmax; ymax]]
+	aspectratio = (xmax-xmin)/(ymax-ymin)
 	if normalize
-		T = Lar.t(0,1) * Lar.s(1,-1) * Lar.s(1/(xmax-xmin), 1/(ymax-ymin)) * Lar.t(-xmin,-ymin) 
+		if aspectratio < 1
+			umin = 0; vmin = 0; vmax = 1
+			umax = aspectratio
+		elseif aspectratio > 1
+			vmin = 0; umax = 1; umin = 0
+			vmax = aspectratio
+		end
+		T = Lar.t(0,1) * Lar.s(1,-1) * Lar.s((umax-umin), (vmax-vmin)) * 
+			Lar.s(1/(xmax-xmin),1/(ymax-ymin)) * Lar.t(-xmin,-ymin) 
 	else
 		T = Lar.t(0, ymax-ymin) * Lar.s(1,-1)
 	end

@@ -41,7 +41,7 @@ function comp(funs)
 	  return x -> f(g(x))
 	end
     id = x->x
-    return reduce(compose, id, funs)
+    return reduce(compose, funs; init=id)
 end
 
 
