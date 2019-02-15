@@ -169,7 +169,7 @@ end
 	view(hpc::PyObject)
 	
 Base.view extension. 
-Display a *Python*  `HPC` (Hierarchica Polyhedral Complex) `object` using 
+Display a *Python*  `HPC` (Hierarchical Polyhedral Complex) `object` using 
 the *`PyPlasm` viewer*, written in C++ with `OpenGL` and acceleration algorithms 
 for *big geometric data* structures. 
 
@@ -192,6 +192,40 @@ function view(hpc::Plasm.Hpc)
 	p = PyCall.pyimport("pyplasm")
 	p["VIEW"](hpc)
 end
+
+
+
+"""
+	view(hpcs::Array{Plasm.Hpc})
+
+Base.view extension. 
+Display a *Python*  `HPC` (Hierarchical Polyhedral Complex) `object`, starting from 
+a *Julia* array of `PyCall.PyObject`s.
+
+# Example
+
+```
+using LinearAlgebraicRepresentation
+Lar = LinearAlgebraicRepresentation
+
+EV = [[1,2],[2,3],[3,4],[4,5],[5,6],[1,6],
+[6,7],[4,7],[2,7],[5,8],[1,8],[3,8]]
+V = hcat([[2.,1],[2,2],[1,2],[0,3],[0,0],[3,0],[3,3],[1,1]]...)
+
+spanningtree, fronds = Lar.depth_first_search(EV)
+
+hpc1 = Plasm.numbering(1.25)((V,[[[k] for k=1:size(V,2)], spanningtree]))
+hpc2 = Plasm.numbering(1.25)((V,[[[k] for k=1:size(V,2)], fronds]))
+Plasm.view([ Plasm.color("cyan")(hpc1) , Plasm.color("magenta")(hpc2) ])
+```
+"""
+function view(hpcs::Array{Plasm.Hpc})
+	p = PyCall.pyimport("pyplasm")
+	hpc = p["STRUCT"](hpcs)
+	p["VIEW"](hpc)
+end
+
+
 
 
 
@@ -576,7 +610,7 @@ function svg2lar(filename::String; normalize=true)::Lar.LAR
 			line3 = [ x+width, y, x+width, y+height ]
 			line4 = [ x, y+height, x+width, y+height ]
 			push!(outlines, line1, line2, line3, line4)
-		# SVG <rect > primitives (TODO)
+		# SVG <path  > primitives (TODO)
 		# see https://github.com/regebro/svg.path
 		end
 	end
@@ -620,6 +654,7 @@ function svg2lar(filename::String; normalize=true)::Lar.LAR
 		T = Lar.t(0, ymax-ymin) * Lar.s(1,-1)
 	end
 	W = T[1:2,:] * [V;ones(1,size(V,2))]
-	V = map( x->round(x,sigdigits=8), W )
+	#V = map( x->round(x,sigdigits=8), W )
+	V = map(Lar.approxVal(8), W)
 	return V,EV
 end
