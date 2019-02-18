@@ -166,7 +166,7 @@ end
 
 
 """
-	view(hpc::PyObject)
+	view(hpc::PyCall.PyObject)
 	
 Base.view extension. 
 Display a *Python*  `HPC` (Hierarchical Polyhedral Complex) `object` using 
@@ -188,7 +188,7 @@ at 0x140d6c780> >
 julia> Plasm.view(hpc)
 ``` 
 """
-function view(hpc::Plasm.Hpc)
+function view(hpc)
 	p = PyCall.pyimport("pyplasm")
 	p["VIEW"](hpc)
 end
@@ -196,7 +196,7 @@ end
 
 
 """
-	view(hpcs::Array{Plasm.Hpc})
+	view(hpcs::Array{PyCall.PyObject})
 
 Base.view extension. 
 Display a *Python*  `HPC` (Hierarchical Polyhedral Complex) `object`, starting from 
@@ -219,7 +219,7 @@ hpc2 = Plasm.numbering(1.25)((V,[[[k] for k=1:size(V,2)], fronds]))
 Plasm.view([ Plasm.color("cyan")(hpc1) , Plasm.color("magenta")(hpc2) ])
 ```
 """
-function view(hpcs::Array{Plasm.Hpc})
+function view(hpcs::Array{PyCall.PyObject})
 	p = PyCall.pyimport("pyplasm")
 	hpc = p["STRUCT"](hpcs)
 	p["VIEW"](hpc)
@@ -584,12 +584,33 @@ end
 
 
 
-
+"""
+	const cmdsplit
+	
+Regex for splitting the `d` element of a `<path` element into
+a sequence of graphics commnds.
+"""
 const cmdsplit = r"\s*([mMzZlLhHvVcCsSqQtTaA])\s*"
+
+
+"""
+	const digitRegEx
+	
+Regex for extracting numeric params from from a sequence of graphics 
+commnds of a `<path` element.
+"""
 const digitRegEx = r"\s*(-?[0-9]*\.?\d+)\s*"
 
 """
+	pathparse(elements)
 
+Parse graphics commands in SVG `<path` tagged element.
+
+# Example
+
+```julia
+
+```
 """
 function pathparse(elements)
 	tokens = split(elements[2],'\"')
@@ -633,15 +654,76 @@ end
 
 
 
+"""
+	lines2lar(lines)
+
+LAR model construction from array of float quadruples.
+Each `line` in input array stands for `x1,y1,x2,y2`.
+"""
+function lines2lar(lines)
+	vertdict = OrderedDict{Array{Float64,1}, Int64}()
+	EV = Array{Int64,1}[]
+	idx = 0
+	for h=1:size(lines,2)
+		x1,y1,x2,y2 = lines[:,h]
+		
+		if ! haskey(vertdict, [x1,y1])
+			idx += 1
+			vertdict[[x1,y1]] = idx
+		end
+		if ! haskey(vertdict, [x2,y2])
+			idx += 1
+			vertdict[[x2,y2]] = idx
+		end
+		v1,v2 = vertdict[[x1,y1]],vertdict[[x2,y2]]
+		push!(EV, [v1,v2])
+	end
+	V = hcat(collect(keys(vertdict))...) 
+	return V,EV
+end
+
+
 
 """
-	svg2lar(filename::String; normalize=true)::Lar.LAR
+	normalize(V::Lar.points; flag=true::Bool)::Lar.points
+
+2D normalization transformation (isomorphic by defauls) of model 
+vertices to normalized coordinates ``[0,1]^2``.
+"""
+function normalize(V; flag=true)
+	xmin = minimum(V[1,:]); ymin = minimum(V[2,:]); 
+	xmax = maximum(V[1,:]); ymax = maximum(V[2,:]); 
+	box = [[xmin; ymin] [xmax; ymax]]	# containment box
+	aspectratio = (xmax-xmin)/(ymax-ymin)
+	if flag
+		if aspectratio > 1
+			umin = 0; umax = 1
+			vmin = 0; vmax = 1/aspectratio; ty = vmax
+		elseif aspectratio < 1 
+			umin = 0; umax = aspectratio
+			vmin = 0; vmax = 1; ty = vmax
+		end
+		T = Lar.t(0,ty) * Lar.s(1,-1) * Lar.s((umax-umin), (vmax-vmin)) * 
+			Lar.s(1/(xmax-xmin),1/(ymax-ymin)) * Lar.t(-xmin,-ymin) 
+	else
+		T = Lar.t(0, ymax-ymin) * Lar.s(1,-1)
+	end
+	W = T[1:2,:] * [V;ones(1,size(V,2))]
+	#V = map( x->round(x,sigdigits=8), W )
+	V = map(Lar.approxVal(8), W)
+	return V
+end
+
+
+
+"""
+	svg2lar(filename::String; flag=true)::Lar.LAR
 
 Parse a SVG file to a `LAR` model `(V,EV)`.
 Only  `<line >` and `<rect >` SVG primitives are currently translated. 
 TODO:  interpretation of `<path >` and transformations.
 """
-function svg2lar(filename::String; normalize=true)::Lar.LAR
+function svg2lar(filename::String; flag=true)::Lar.LAR
 	outlines = Array{Float64,1}[]
 	for line in eachline(filename)
 		parts = split(line, ' ')
@@ -673,44 +755,8 @@ function svg2lar(filename::String; normalize=true)::Lar.LAR
 	lines = hcat(outlines...)
 	lines = map( x->round(x,sigdigits=8), lines )
 	# LAR model construction
-	vertdict = OrderedDict{Array{Float64,1}, Int64}()
-	EV = Array{Int64,1}[]
-	idx = 0
-	for h=1:size(lines,2)
-		x1,y1,x2,y2 = lines[:,h]
-		
-		if ! haskey(vertdict, [x1,y1])
-			idx += 1
-			vertdict[[x1,y1]] = idx
-		end
-		if ! haskey(vertdict, [x2,y2])
-			idx += 1
-			vertdict[[x2,y2]] = idx
-		end
-		v1,v2 = vertdict[[x1,y1]],vertdict[[x2,y2]]
-		push!(EV, [v1,v2])
-	end
-	V = hcat(collect(keys(vertdict))...) 
+	V,EV = lines2lar(lines)
 	# normalization 
-	xmin = minimum(V[1,:]); ymin = minimum(V[2,:]); 
-	xmax = maximum(V[1,:]); ymax = maximum(V[2,:]); 
-	box = [[xmin; ymin] [xmax; ymax]]
-	aspectratio = (xmax-xmin)/(ymax-ymin)
-	if normalize
-		if aspectratio < 1
-			umin = 0; vmin = 0; vmax = 1
-			umax = aspectratio
-		elseif aspectratio > 1
-			vmin = 0; umax = 1; umin = 0
-			vmax = aspectratio
-		end
-		T = Lar.t(0,1) * Lar.s(1,-1) * Lar.s((umax-umin), (vmax-vmin)) * 
-			Lar.s(1/(xmax-xmin),1/(ymax-ymin)) * Lar.t(-xmin,-ymin) 
-	else
-		T = Lar.t(0, ymax-ymin) * Lar.s(1,-1)
-	end
-	W = T[1:2,:] * [V;ones(1,size(V,2))]
-	#V = map( x->round(x,sigdigits=8), W )
-	V = map(Lar.approxVal(8), W)
+	V = normalize(V,flag=flag)
 	return V,EV
 end
