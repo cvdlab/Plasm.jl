@@ -583,6 +583,57 @@ function viewexploded(V::Lar.Points, cells::Lar.Cells)
 end
 
 
+
+
+const cmdsplit = r"\s*([mMzZlLhHvVcCsSqQtTaA])\s*"
+const digitRegEx = r"\s*(-?[0-9]*\.?\d+)\s*"
+
+"""
+
+"""
+function pathparse(elements)
+	tokens = split(elements[2],'\"')
+	if tokens[1]=="d="
+		pathstring = tokens[2]
+
+		iterator = eachmatch(cmdsplit, pathstring)
+		offsets = [m.offset for m in iterator]
+		commands = [m.match for m in iterator]
+		
+		substrings = [pathstring[offsets[k]+1:offsets[k+1]-1] 
+			for k=1:length(offsets)-1]
+		push!(substrings, pathstring[offsets[end]+1:end])
+		
+		params = Array{Float64,1}[]
+		for substring in substrings
+			numbers = []
+			for match in eachmatch(digitRegEx, substring)
+				push!(numbers,String(match.match))
+			end
+			numbers = map(x->parse(Float64,x),numbers)
+			push!(params,numbers)
+		end
+		
+		lines = Array{Float64,1}[]
+		startpoint, endpoint = 0.0, 0.0
+		for (command, args) in zip(commands, params)
+			if command == "M"
+				startpoint = args
+			elseif command == "L"
+				endpoint = args
+				line = vcat([startpoint,endpoint]...)
+				push!(lines, line)
+			end
+		end
+	else
+		error("'d' position in '<path' element wrong")
+	end
+	return lines
+end
+
+
+
+
 """
 	svg2lar(filename::String; normalize=true)::Lar.LAR
 
@@ -594,14 +645,16 @@ function svg2lar(filename::String; normalize=true)::Lar.LAR
 	outlines = Array{Float64,1}[]
 	for line in eachline(filename)
 		parts = split(line, ' ')
+		elements = [part for part in parts if part≠""]
+		tag = elements[1]
 		# SVG <line > primitives
-		if parts[1] == "<line"
+		if tag == "<line"
 			regex = r"""(<line )(.+)(" x1=")(.+)(" y1=")(.+)(" x2=")(.+)(" y2=")(.+)("/>)"""
 			coords = collect(match( regex , line)[k] for k in (4,6,8,10))
 			outline = [ parse(Float64, string) for string in coords ]
 			push!(outlines, outline)
 		# SVG <rect > primitives
-		elseif parts[1] == "<rect"
+		elseif tag == "<rect"
 			regex = r"""(<rect x=")(.+?)(" y=")(.+?)(" )(.*?)( width=")(.+?)(" height=")(.+?)("/>)"""
 			coords = collect(match( regex , line)[k] for k in (2,4,8,10))
 			x, y, width, height = [ parse(Float64, string) for string in coords ]
@@ -612,6 +665,9 @@ function svg2lar(filename::String; normalize=true)::Lar.LAR
 			push!(outlines, line1, line2, line3, line4)
 		# SVG <path  > primitives (TODO)
 		# see https://github.com/regebro/svg.path
+		elseif tag == "<path"
+			polyline = pathparse(elements)
+			append!(outlines, polyline)
 		end
 	end
 	lines = hcat(outlines...)

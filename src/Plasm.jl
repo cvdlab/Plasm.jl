@@ -161,6 +161,9 @@ function color(key::String)::PyObject
 	return  colors[key]
 end
 
+const colorkey = ["orange", "red", "green", "blue", "cyan", "magenta", "yellow", 
+	"white", "black", "purple", "gray", "brown"]
+
 
 """ 
 	Color4f
