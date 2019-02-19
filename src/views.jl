@@ -585,6 +585,42 @@ end
 
 
 """
+	cubicbezier2D(curvePts::Array{Array{Float,1},1})
+
+Produce the two ``coordinate functions`` for a ``cubic`` *Bézier curve* in ``2D``.
+The input is the array `curvePts` of 4 control points with 2 coordinates.
+
+# Example
+
+```
+julia> curvePts = [[1232.24, 1340.84],[1259.53, 1119.86],
+	[1417.91, 1015.16],[1133.47, 1010.63]]
+
+julia> bx,by = cubicbezier2D(curvePts);
+
+julia> (bx(0), by(0))
+(1232.24, 1340.84)
+
+julia> (bx(1), by(1))
+(1133.47, 1010.63)
+```
+"""
+function cubicbezier2D( curvePts::Array{Array{Float64,1},1} )
+	b1(u) = (1 - u)^3
+	b2(u) = 3*u*(1 - u)^2
+	b3(u) = 3*u^2*(1 - u)
+	b4(u) = u^3
+	cntrlverts = hcat(curvePts...)
+	x = cntrlverts[1,:]
+	y = cntrlverts[2,:]
+	Bx = u -> x[1]*b1(u) + x[2]*b2(u) + x[3]*b3(u) + x[4]*b4(u)
+	By = u -> y[1]*b1(u) + y[2]*b2(u) + y[3]*b3(u) + y[4]*b4(u)
+	return Bx,By
+end
+
+
+
+"""
 	const cmdsplit
 	
 Regex for splitting the `d` element of a `<path` element into
@@ -636,10 +672,10 @@ function pathparse(data)
 	end
 	
 	lines = Array{Float64,1}[]
-	startpoint, endpoint = 0.0, 0.0
+	global startpoint, endpoint = 0.0, 0.0
 	for (command, args) in zip(commands, params)
 		if command == "M"
-			startpoint = args
+			global startpoint = args
 		elseif command == "L"
 			endpoint = args
 			line = vcat([startpoint,endpoint]...)
@@ -651,8 +687,19 @@ function pathparse(data)
 			endpoint = args[5:6]
 			curvePts = [startpoint,contrlpt1,contrlpt2,endpoint]
 			println(curvePts)
+			
+			Bx,By = cubicbezier2D(curvePts)
+			pts = [[Bx(u),By(u)] for u=0:.1:1]
+			curvelines = [ vcat([pts[k],pts[k+1]]...) for k=1:length(pts)-1 ]
+			for line in curvelines
+				push!(lines, line)
+			end
+ 			
+ 			push!(lines,vcat(curvePts[1:2]...),vcat(curvePts[2:3]...),
+				vcat(curvePts[3:4]...))
 			startpoint = endpoint
 		end
+		
 	end
 	return lines
 end
@@ -751,7 +798,7 @@ function svg2lar(filename::String; flag=true)::Lar.LAR
 			line3 = [ x+width, y, x+width, y+height ]
 			line4 = [ x, y+height, x+width, y+height ]
 			push!(outlines, line1, line2, line3, line4)
-		# SVG <path  > primitives (TODO)
+		# SVG <path  > primitives 
 		# see https://github.com/chebfun/chebfun/issues/1617
 		elseif tag == "<path"
 			dataregex = r"""d=(".*?")(.*?)"""

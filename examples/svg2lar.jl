@@ -4,7 +4,7 @@ using Plasm
 
 function show(filename)
 	V, EV = Plasm.svg2lar(filename)
-	Plasm.view(Plasm.numbering(.2)((V,[[[k] for k=1:size(V,2)], EV])))
+	Plasm.view(Plasm.numbering(.075)((V,[[[k] for k=1:size(V,2)], EV])))
 	V, EV = Plasm.svg2lar(filename, flag=false)
 	Plasm.view(Plasm.numbering(2)((V,[[[k] for k=1:size(V,2)], EV])))
 end
