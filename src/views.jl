@@ -612,42 +612,47 @@ Parse graphics commands in SVG `<path` tagged element.
 
 ```
 """
-function pathparse(elements)
-	tokens = split(elements[2],'\"')
-	if tokens[1]=="d="
-		pathstring = tokens[2]
+function pathparse(data)
+	@show data
+	tokens = split(data,'\"')
+	pathstring = tokens[2]
 
-		iterator = eachmatch(cmdsplit, pathstring)
-		offsets = [m.offset for m in iterator]
-		commands = [m.match for m in iterator]
-		
-		substrings = [pathstring[offsets[k]+1:offsets[k+1]-1] 
-			for k=1:length(offsets)-1]
-		push!(substrings, pathstring[offsets[end]+1:end])
-		
-		params = Array{Float64,1}[]
-		for substring in substrings
-			numbers = []
-			for match in eachmatch(digitRegEx, substring)
-				push!(numbers,String(match.match))
-			end
-			numbers = map(x->parse(Float64,x),numbers)
-			push!(params,numbers)
+	iterator = eachmatch(cmdsplit, pathstring)
+	offsets = [m.offset for m in iterator]
+	commands = [m.match for m in iterator]
+	
+	substrings = [pathstring[offsets[k]+1:offsets[k+1]-1] 
+		for k=1:length(offsets)-1]
+	push!(substrings, pathstring[offsets[end]+1:end])
+	
+	params = Array{Float64,1}[]
+	for substring in substrings
+		numbers = []
+		for match in eachmatch(digitRegEx, substring)
+			push!(numbers,String(match.match))
 		end
-		
-		lines = Array{Float64,1}[]
-		startpoint, endpoint = 0.0, 0.0
-		for (command, args) in zip(commands, params)
-			if command == "M"
-				startpoint = args
-			elseif command == "L"
-				endpoint = args
-				line = vcat([startpoint,endpoint]...)
-				push!(lines, line)
-			end
+		numbers = map(x->parse(Float64,x),numbers)
+		push!(params,numbers)
+	end
+	
+	lines = Array{Float64,1}[]
+	startpoint, endpoint = 0.0, 0.0
+	for (command, args) in zip(commands, params)
+		if command == "M"
+			startpoint = args
+		elseif command == "L"
+			endpoint = args
+			line = vcat([startpoint,endpoint]...)
+			startpoint = endpoint
+			push!(lines, line)
+		elseif command == "C"
+			contrlpt1 = args[1:2]
+			contrlpt2 = args[3:4]
+			endpoint = args[5:6]
+			curvePts = [startpoint,contrlpt1,contrlpt2,endpoint]
+			println(curvePts)
+			startpoint = endpoint
 		end
-	else
-		error("'d' position in '<path' element wrong")
 	end
 	return lines
 end
@@ -729,6 +734,7 @@ function svg2lar(filename::String; flag=true)::Lar.LAR
 		parts = split(line, ' ')
 		elements = [part for part in parts if part≠""]
 		tag = elements[1]
+		
 		# SVG <line > primitives
 		if tag == "<line"
 			regex = r"""(<line )(.+)(" x1=")(.+)(" y1=")(.+)(" x2=")(.+)(" y2=")(.+)("/>)"""
@@ -746,9 +752,11 @@ function svg2lar(filename::String; flag=true)::Lar.LAR
 			line4 = [ x, y+height, x+width, y+height ]
 			push!(outlines, line1, line2, line3, line4)
 		# SVG <path  > primitives (TODO)
-		# see https://github.com/regebro/svg.path
+		# see https://github.com/chebfun/chebfun/issues/1617
 		elseif tag == "<path"
-			polyline = pathparse(elements)
+			dataregex = r"""d=(".*?")(.*?)"""
+			data = string(match( dataregex , line)[1])		
+			polyline = pathparse(data)
 			append!(outlines, polyline)
 		end
 	end

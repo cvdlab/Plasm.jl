@@ -9,6 +9,8 @@ function show(filename)
 	Plasm.view(Plasm.numbering(2)((V,[[[k] for k=1:size(V,2)], EV])))
 end
 
+show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/curved.svg")
+show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/twopaths.svg")
 show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/paths.svg")
 show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/boundarytest2.svg")
 show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/tile.svg")
