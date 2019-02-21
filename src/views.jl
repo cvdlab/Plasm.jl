@@ -587,7 +587,6 @@ function viewexploded(W::Lar.Points, cells::Lar.ChainOp) # W by rows ...
 	EV = [findnz(cells[k,:])[1] for k=1:size(cells,1)]
 	function lar2exploded_hpc0(sx=1.2, sy=1.2, sz=1.2)
 		Plasm.viewexploded(V::Lar.Points, EV::Lar.Cells)(sx,sy,sz)
-		Plasm.numbering(V::Lar.Points, EV::Lar.Cells)(sx,sy,sz)
 	end
 	return lar2exploded_hpc0
 end
