@@ -582,6 +582,16 @@ function viewexploded(V::Lar.Points, cells::Lar.Cells)
 	return lar2exploded_hpc0
 end
 
+function viewexploded(W::Lar.Points, cells::Lar.ChainOp) # W by rows ...
+	V = convert(Lar.Points, transpose(W))
+	EV = [findnz(cells[k,:])[1] for k=1:size(cells,1)]
+	function lar2exploded_hpc0(sx=1.2, sy=1.2, sz=1.2)
+		Plasm.viewexploded(V::Lar.Points, EV::Lar.Cells)(sx,sy,sz)
+		Plasm.numbering(V::Lar.Points, EV::Lar.Cells)(sx,sy,sz)
+	end
+	return lar2exploded_hpc0
+end
+
 
 
 """
@@ -648,8 +658,7 @@ Parse graphics commands in SVG `<path` tagged element.
 
 ```
 """
-function pathparse(data)
-	@show data
+function pathparse(data, cnrtlpolygon=false)
 	tokens = split(data,'\"')
 	pathstring = tokens[2]
 
@@ -695,8 +704,10 @@ function pathparse(data)
 				push!(lines, line)
 			end
  			
- 			push!(lines,vcat(curvePts[1:2]...),vcat(curvePts[2:3]...),
-				vcat(curvePts[3:4]...))
+ 			if cnrtlpolygon
+				push!(lines,vcat(curvePts[1:2]...),vcat(curvePts[2:3]...),
+					vcat(curvePts[3:4]...))
+			end
 			startpoint = endpoint
 		end
 		
@@ -772,8 +783,8 @@ end
 	svg2lar(filename::String; flag=true)::Lar.LAR
 
 Parse a SVG file to a `LAR` model `(V,EV)`.
-Only  `<line >` and `<rect >` SVG primitives are currently translated. 
-TODO:  interpretation of `<path >` and transformations.
+Only  `<line >` and `<rect >` and `<path >` SVG primitives are currently translated. 
+TODO:  interpretation of transformations.
 """
 function svg2lar(filename::String; flag=true)::Lar.LAR
 	outlines = Array{Float64,1}[]
