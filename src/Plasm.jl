@@ -146,23 +146,23 @@ julia> Plasm.view(Plasm.green(hpc))
 function color(key::String)::PyObject 
 	p = PyCall.pyimport("pyplasm")
 	colors = OrderedDict([
-	"orange" => p["COLOR"](p["ORANGE"]),
+	"white" => p["COLOR"](p["WHITE"]),
 	"red" => p["COLOR"](p["RED"]),
 	"green" => p["COLOR"](p["GREEN"]),
 	"blue" => p["COLOR"](p["BLUE"]),
 	"cyan" => p["COLOR"](p["CYAN"]),
 	"magenta" => p["COLOR"](p["MAGENTA"]),
 	"yellow" => p["COLOR"](p["YELLOW"]),
-	"white" => p["COLOR"](p["WHITE"]),
 	"black" => p["COLOR"](p["BLACK"]),
+	"orange" => p["COLOR"](p["ORANGE"]),
 	"purple" => p["COLOR"](p["PURPLE"]),
 	"gray" => p["COLOR"](p["GRAY"]),
 	"brown" => p["COLOR"](p["BROWN"]) ])
 	return  colors[key]
 end
 
-const colorkey = ["orange", "red", "green", "blue", "cyan", "magenta", "yellow", 
-	"white", "black", "purple", "gray", "brown"]
+const colorkey = ["white", "red", "green", "blue", "cyan", "magenta", "yellow", 
+	"black", "orange", "purple", "gray", "brown"]
 
 
 """ 

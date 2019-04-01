@@ -592,6 +592,21 @@ function viewexploded(W::Lar.Points, cells::Lar.ChainOp) # W by rows ...
 end
 
 
+"""
+	viewlarcolor(V::Lar.Points, CVs::Array{Lar.Cells})
+
+Display a colored view of the function parameters, drawing each `Cells` array in function parameters with a random color.
+
+""" 
+function viewlarcolor(V::Lar.Points, CVs::Array{Lar.Cells})
+	hpcs = [ Plasm.lar2hpc(V,CVs[i]) for i=1:length(CVs) ]
+	Plasm.view([ Plasm.color(Plasm.colorkey[(k%12)==0 ? 12 : k%12])(hpcs[k]) 
+		for k=1:(length(hpcs)) ])
+end
+
+
+
+
 
 """
 	cubicbezier2D(curvePts::Array{Array{Float,1},1})
