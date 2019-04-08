@@ -455,6 +455,55 @@ function hpc_exploded( model )
 end
 
 
+"""
+	lar_exploded(model)
+
+Generate an exploded `Hpc` value starting from a `LARmodel` instance.
+Useful to show the explosion of a 2-complex made by possibly non-convex polygons.
+
+# Example
+
+```
+V, copEV, copFE = Lar.planar_arrangement(W::Lar.Points, cop_EW::Lar.ChainOp)
+EVs = FV2EVs(copEV, copFE) # polygonal face fragments
+
+Plasm.viewcolor(V::Lar.Points, EVs::Array{Lar.Cells})
+model = V,EVs
+Plasm.view(lar_exploded(model)(1.2,1.2,1.2))
+```
+"""
+function lar_exploded(model)
+	function lar_exploded0( sx=1.2, sy=1.2, sz=1.2 )
+		p = PyCall.pyimport("pyplasm")
+		verts,arrayofcells = model
+		out = []
+		for cell in arrayofcells
+			vcell = convert(Lar.Cells,[collect(Set(cat(cell)))])
+		
+			center = sum([verts[:,v] for v in vcell[1]])/length(vcell[1])
+			scaled_center = size(center,1)==2 ? center .* [sx,sy] :  
+												center .* [sx,sy,sz]
+			translation_vector = scaled_center - center
+			vertcell = [verts[:,k]+translation_vector for k in vcell[1]]
+			cellverts = hcat(vertcell...)
+
+			py_verts = Plasm.points2py( cellverts )
+			vdict = DataStructures.OrderedDict( zip( vcell[1], 
+						[k for k=1:length(vcell[1])] ))
+			edges = [[vdict[e[1]], vdict[e[2]]] for e in cell]
+			py_cells = Plasm.cells2py( edges )
+			
+			hpc = p["MKPOL"]([ py_verts, py_cells, [] ])
+			push!(out, hpc)
+		end
+		hpc = p["STRUCT"](out)
+		return hpc
+	end
+	return lar_exploded0
+end
+
+
+
 
 """
 	lar2hpc(V::Points, CV::Cells)::Hpc
@@ -593,12 +642,17 @@ end
 
 
 """
-	viewlarcolor(V::Lar.Points, CVs::Array{Lar.Cells})
+	viewcolor(V::Lar.Points, CVs::Array{Lar.Cells})
 
 Display a colored view of the function parameters, drawing each `Cells` array in function parameters with a random color.
 
+# Example
+
+```
+
+```
 """ 
-function viewlarcolor(V::Lar.Points, CVs::Array{Lar.Cells})
+function viewcolor(V::Lar.Points, CVs::Array{Lar.Cells})
 	hpcs = [ Plasm.lar2hpc(V,CVs[i]) for i=1:length(CVs) ]
 	Plasm.view([ Plasm.color(Plasm.colorkey[(k%12)==0 ? 12 : k%12])(hpcs[k]) 
 		for k=1:(length(hpcs)) ])
