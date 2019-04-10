@@ -406,7 +406,7 @@ Plasm.view( Plasm.numbering(0.05)((V, copEV, copFE)) )
 ```
 """
 function numbering(scaling=0.1)
-	function numbering0((V, copEV, copFE))
+	function numbering0((V, copEV::Lar.ChainOp, copFE::Lar.ChainOp))
 		VV = [[k] for k=1:size(V,1)]
 		EV = [findnz(copEV[h,:])[1] for h=1:size(copEV,1)]
 		FV = [collect(Set(cat(EV[e] for e in findnz(copFE[i,:])[1]))) for i=1:size(copFE,1)]
