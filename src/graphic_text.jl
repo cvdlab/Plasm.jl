@@ -383,7 +383,8 @@ end
 
 
 """
-	numbering(V, copEV::Lar.ChainOp, copFE::Lar.ChainOp)::Plasm.Hpc
+#	numbering(scaling=0.1)
+#		(V::Lar.Points, copEV::Lar.ChainOp, copFE::Lar.ChainOp)::Lar.Hpc
 
 Produce the numbered `Hpc` of `planar_arrangement()` 2D output. 
 Vertices in `V` are stored by row.
@@ -405,8 +406,9 @@ V, copEV, copFE = Lar.planar_arrangement(W, cop_EW);
 Plasm.view( Plasm.numbering(0.05)((V, copEV, copFE)) )
 ```
 """
-function numbering(scaling=0.1)
-	function numbering0((V, copEV::Lar.ChainOp, copFE::Lar.ChainOp))
+function numbering1(scaling=0.1)
+	function numbering0(model::Tuple{Lar.Points,Lar.ChainOp,Lar.ChainOp})
+		(V, copEV, copFE) = model
 		VV = [[k] for k=1:size(V,1)]
 		EV = [findnz(copEV[h,:])[1] for h=1:size(copEV,1)]
 		FV = [collect(Set(cat(EV[e] for e in findnz(copFE[i,:])[1]))) for i=1:size(copFE,1)]
