@@ -816,12 +816,17 @@ end
 
 
 """
-	normalize(V::Lar.points; flag=true::Bool)::Lar.points
+	normalize(V::Lar.Points; flag=true::Bool)::Lar.Points
 
-2D normalization transformation (isomorphic by defauls) of model 
+2D normalization transformation (isomorphic by defaults) of model 
 vertices to normalized coordinates ``[0,1]^2``.
 """
-function normalize(V; flag=true)
+function normalize(V::Lar.Points; flag=true)
+	m,n = size(V)
+	if m > n # V by rows
+		V = convert(Lar.Points, V')
+	end
+	
 	xmin = minimum(V[1,:]); ymin = minimum(V[2,:]); 
 	xmax = maximum(V[1,:]); ymax = maximum(V[2,:]); 
 	box = [[xmin; ymin] [xmax; ymax]]	# containment box
@@ -840,10 +845,23 @@ function normalize(V; flag=true)
 		T = Lar.t(0, ymax-ymin) * Lar.s(1,-1)
 	end
 	W = T[1:2,:] * [V;ones(1,size(V,2))]
-	#V = map( x->round(x,sigdigits=8), W )
+	#V = map( x->round(x,digits=8), W )
 	V = map(Lar.approxVal(8), W)
+
+	if m > n # V by rows
+		V = convert(Lar.Points, V')
+	end
 	return V
 end
+
+
+function normalize3D(V::Lar.Points; flag=true)
+	Vxy = Plasm.normalize(V[1:2,:], flag)
+	zmin = minimum(V[3,:]); zmax = maximum(V[3,:]);
+	Vz = (V[3,:] - zmin) / (zmax - zmin)
+	return [Vxy; Vz]
+end
+
 
 
 
