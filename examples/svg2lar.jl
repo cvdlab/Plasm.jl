@@ -5,9 +5,7 @@ import Base.show
 
 function show(filename)
 	V, EV = Plasm.svg2lar(filename)
-	Plasm.view(Plasm.numbering(.075)((V,[[[k] for k=1:size(V,2)], EV])))
-	V, EV = Plasm.svg2lar(filename, flag=false)
-	Plasm.view(Plasm.numbering(2)((V,[[[k] for k=1:size(V,2)], EV])))
+	Plasm.view(V,EV)
 	return V, EV
 end
 
@@ -20,4 +18,4 @@ end
 #show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/interior.svg")
 #show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/holes.svg")
 
-V,EV = show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/holes.svg")
+V,EV = show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/Lar.svg")
