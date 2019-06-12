@@ -225,11 +225,10 @@ end
 #end
 
 include("./fenvs.jl")
-
 include("./views.jl")
-
 include("./graphic_text.jl")
-
 include("./utilities.jl")
+
+include("./viewer/Viewer.jl")
 
 end # module
