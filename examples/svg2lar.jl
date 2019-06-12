@@ -1,19 +1,21 @@
-using Plasm
 using LinearAlgebraicRepresentation
 Lar = LinearAlgebraicRepresentation
-using DataStructures
-using PyCall
-p = PyCall.pyimport("pyplasm")
+using Plasm
+import Base.show
 
-filename = "/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/boundarytest2.svg"
-V, EV = Plasm.svg2lar(filename)
-Plasm.view(Plasm.numbering(.2)((V,[[[k] for k=1:size(V,2)], EV])))
-V, EV = Plasm.svg2lar(filename, normalize=false)
-Plasm.view(Plasm.numbering(.2)((V,[[[k] for k=1:size(V,2)], EV])))
+function show(filename)
+	V, EV = Plasm.svg2lar(filename)
+	Plasm.view(V,EV)
+	return V, EV
+end
 
-filename = "/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/tile.svg"
-V, EV = Plasm.svg2lar(filename)
-Plasm.view(Plasm.numbering(.2)((V,[[[k] for k=1:size(V,2)], EV])))
-V, EV = Plasm.svg2lar(filename, normalize=false)
-Plasm.view(Plasm.numbering(.2)((V,[[[k] for k=1:size(V,2)], EV])))
+#show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/new.svg")
+#show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/curved.svg")
+#show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/twopaths.svg")
+#show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/paths.svg")
+#show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/boundarytest2.svg")
+#show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/tile.svg")
+#show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/interior.svg")
+#show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/holes.svg")
 
+V,EV = show("/Users/paoluzzi/Documents/dev/Plasm.jl/test/svg/Lar.svg")

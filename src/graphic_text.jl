@@ -5,189 +5,9 @@ import Base.cat
 
 View = Plasm.view	
 
-""" 
-	apply(affineMatrix::Matrix)(larmodel::LAR)::LAR
-
-Apply the `affineMatrix` parameter to the vertices of `larmodel`.
-
-# Example
-
-```
-julia> square = Lar.cuboid([1,1])
-([0.0 0.0 1.0 1.0; 0.0 1.0 0.0 1.0], Array{Int64,1}[[1, 2, 3, 4]])
-
-julia> Plasm.apply(Lar.t(1,2))(square)
-([1.0 1.0 2.0 2.0; 2.0 3.0 2.0 3.0], Array{Int64,1}[[1, 2, 3, 4]])
-```
-"""
-function apply(affineMatrix)
-	function apply0(larmodel)
-		return Lar.struct2lar(Lar.Struct([ affineMatrix,larmodel ]))
-	end
-	return apply0
-end
-
-
-
-""" 
-	comp(funs::Array)
-
-Standard mathematical composition. 
-
-Pipe execution from right to left on application to actual parameter.
-"""
-function comp(funs)
-    function compose(f,g)
-	  return x -> f(g(x))
-	end
-    id = x->x
-    return reduce(compose, id, funs)
-end
-
-
-
-"""
-	cons(funs::Array)(x::Any)::Array
-
-*Construction* functional of FL and PLaSM languages.
-
-Provides a *vector* functional that returns the array of 
-applications of component functions to actual parameter.
-
-# Example 
-
-```
-julia> Plasm.cons([cos,sin])(0)
-2-element Array{Float64,1}:
- 1.0
- 0.0
-```
-"""
-function cons(funs)
-	return x -> [f(x) for f in funs]
-end
-
-
-
-""" 
-	k(Any)(x)
-
-*Constant* functional of FL and PLaSM languages.
-
-Gives a constant functional that always returns the actual parameter
-when applied to another parameter.
-
-#	Examples
-
-```
-julia> Plasm.k(10)(100)
-10
-
-julia> Plasm.k(sin)(cos)
-sin
-```
-"""
-function k(Any)
-	x->Any
-end
-
-
-""" 
-	aa(fun::Function)(args::Array)::Array
-
-AA applies fun to each element of the args sequence 
-
-# Example 
-
-```
-julia> Plasm.aa(sqrt)([1,4,9,16])
-4-element Array{Float64,1}:
- 1.0
- 2.0
- 3.0
- 4.0
-```
-"""
-function aa(fun)
-	function aa1(args::Array)
-		map(fun,args)
-	end
-	return aa1
-end
-
-
-
-""" 
-	id(x::Anytype)
-
-Identity function.  Return the argument.
-
-"""
-id = x->x
-
-
-
-	
-""" 
-	distr(args::Union{Tuple,Array})::Array
-
-Distribute right. The parameter `args` must contain a `list` and an element `x`. 
-Return the `pair` array with the elements of `args` coupled with `x`
-
-# Example 
-
-```
-julia> Plasm.distr(([1,2,3],10))
-3-element Array{Array{Int64,1},1}:
- [1, 10]
- [2, 10]
- [3, 10]
-
-julia> Plasm.distr([[1,2,3],10])
-3-element Array{Array{Int64,1},1}:
- [1, 10]
- [2, 10]
- [3, 10]
-```
-"""
-function distr(args)
-	list,element = args
-	return [ [e,element] for e in list ]
-end
-
-
-
-	
-""" 
-	distl(args::Union{Tuple,Array})::Array
-
-Distribute right. The parameter `args` must contain an element `x` and a `list`. 
-Return the `pair` array with `x` coupled with the elements of `args`. 
-
-# Example 
-
-```
-julia> Plasm.distl((10, [1,2,3]))
-3-element Array{Array{Int64,1},1}:
- [10, 1]
- [10, 2]
- [10, 3]
-
-julia> Plasm.distl([10, [1,2,3]])
-3-element Array{Array{Int64,1},1}:
- [10, 1]
- [10, 2]
- [10, 3]
-```
-"""
-function distl(args)
-	element, list = args
-	return [ [element, e] for e in list ]
-end
-
-
+# Graphic text font implementation
 # Vector definition of printable ASCII codes as one-dimensional LAR models.
-# Font design for *Geometric Programming for Computer-Aided Design*, Wiley, 2003. 
+# Font design from *Geometric Programming for Computer-Aided Design*, Wiley, 2003. 
 
 ascii32 = ([0.0; 0.0],Array{Int64,1}[[1]])
 ascii33 = ([1.75 1.75 2.0 2.0 1.5 1.5; 1.75 5.5 0.5 1.0 1.0 0.5],Array{Int64,1}[[1,2],[3,4],[4,5],[5,6],[6,3]])
@@ -556,6 +376,45 @@ function numbering(numberSizeScaling=1)
 			push!( scene, p["COLOR"](colors[h])(hpc) )
 		end
 		p["STRUCT"]( scene )
+	end
+	return numbering0
+end
+
+
+
+"""
+#	numbering(scaling=0.1)
+#		(V::Lar.Points, copEV::Lar.ChainOp, copFE::Lar.ChainOp)::Lar.Hpc
+
+Produce the numbered `Hpc` of `planar_arrangement()` 2D output. 
+Vertices in `V` are stored by row.
+
+# Example
+
+```julia
+using LinearAlgebraicRepresentation
+using Plasm, SparseArrays
+Lar = LinearAlgebraicRepresentation
+
+V,EV = Lar.randomcuboids(7, 1.0);
+V = Plasm.normalize(V,flag=true);
+W = convert(Lar.Points, V');
+cop_EV = Lar.coboundary_0(EV::Lar.Cells);
+cop_EW = convert(Lar.ChainOp, cop_EV);
+V, copEV, copFE = Lar.planar_arrangement(W, cop_EW);
+
+Plasm.view( Plasm.numbering(0.05)((V, copEV, copFE)) )
+```
+"""
+function numbering1(scaling=0.1)
+	function numbering0(model::Tuple{Lar.Points,Lar.ChainOp,Lar.ChainOp})
+		(V, copEV, copFE) = model
+		VV = [[k] for k=1:size(V,1)]
+		EV = [findnz(copEV[h,:])[1] for h=1:size(copEV,1)]
+		FV = [collect(Set(cat(EV[e] for e in findnz(copFE[i,:])[1]))) for i=1:size(copFE,1)]
+		FV = convert(Array{Array{Int64,1},1}, FV)
+		model = (convert(Lar.Points, V'), Lar.Cells[VV,EV,FV])
+		return Plasm.numbering(scaling)(model)
 	end
 	return numbering0
 end
