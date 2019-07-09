@@ -50,7 +50,7 @@ julia> CV
 [1,2,3,4,7,8,9,10],[3,4,5,6,9,10,11,12],[7,8,9,10,13,14,15,16],[9,10,11,12,15,16,17,18]
 ```
 """
-cuboidGrid = Lar.larCuboids
+#cuboidGrid = Lar.larCuboids
 
 
 """
