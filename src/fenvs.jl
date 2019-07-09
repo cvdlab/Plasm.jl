@@ -7,23 +7,21 @@ using DataStructures
 
 
 
-""" 
-	apply(affineMatrix::Matrix)
+"""
+	apply(fun::Function, params::Array)
 
-Apply the `affineMatrix` parameter to the vertices of `larmodel`.
-
-# Example
-
-```
-julia> 
-```
 """
 function apply(fun::Function, params::Array)
 	return fun(params)
 end
+function apply(fun::Function)
+	function apply0(params::Array)
+		return fun(params)
+	end
+	return apply0
+end
 
-
-""" 
+"""
 	apply(affineMatrix::Matrix)(larmodel::LAR)::LAR
 
 Apply the `affineMatrix` parameter to the vertices of `larmodel`.
@@ -47,10 +45,10 @@ end
 
 
 
-""" 
+"""
 	comp(funs::Array)
 
-Standard mathematical composition. 
+Standard mathematical composition.
 
 Pipe execution from right to left on application to actual parameter.
 """
@@ -69,10 +67,10 @@ end
 
 *Construction* functional of FL and PLaSM languages.
 
-Provides a *vector* functional that returns the array of 
+Provides a *vector* functional that returns the array of
 applications of component functions to actual parameter.
 
-# Example 
+# Example
 
 ```
 julia> Plasm.cons([cos,sin])(0)
@@ -87,7 +85,7 @@ end
 
 
 
-""" 
+"""
 	k(Any)(x)
 
 *Constant* functional of FL and PLaSM languages.
@@ -110,12 +108,12 @@ function k(Any)
 end
 
 
-""" 
+"""
 	aa(fun::Function)(args::Array)::Array
 
-AA applies fun to each element of the args sequence 
+AA applies fun to each element of the args sequence
 
-# Example 
+# Example
 
 ```
 julia> Plasm.aa(sqrt)([1,4,9,16])
@@ -135,7 +133,7 @@ end
 
 
 
-""" 
+"""
 	id(x::Anytype)
 
 Identity function.  Return the argument.
@@ -145,14 +143,14 @@ id = x->x
 
 
 
-	
-""" 
+
+"""
 	distr(args::Union{Tuple,Array})::Array
 
-Distribute right. The parameter `args` must contain a `list` and an element `x`. 
+Distribute right. The parameter `args` must contain a `list` and an element `x`.
 Return the `pair` array with the elements of `args` coupled with `x`
 
-# Example 
+# Example
 
 ```
 julia> Plasm.distr(([1,2,3],10))
@@ -169,14 +167,14 @@ end
 
 
 
-	
-""" 
+
+"""
 	distl(args::Union{Tuple,Array})::Array
 
-Distribute right. The parameter `args` must contain an element `x` and a `list`. 
-Return the `pair` array with `x` coupled with the elements of `args`. 
+Distribute right. The parameter `args` must contain an element `x` and a `list`.
+Return the `pair` array with `x` coupled with the elements of `args`.
 
-# Example 
+# Example
 
 ```
 julia> Plasm.distl((10, [1,2,3]))

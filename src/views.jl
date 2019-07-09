@@ -836,7 +836,7 @@ end
 	normalize(V::Lar.Points; flag=true::Bool)::Lar.Points
 
 2D normalization transformation (isomorphic by defaults) of model
-vertices to normalized coordinates ``[0,1]^2``.
+vertices to normalized coordinates ``[0,1]^2``. Used with SVG importing.
 """
 function normalize(V::Lar.Points; flag=true)
 	m,n = size(V)
