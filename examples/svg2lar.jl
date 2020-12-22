@@ -1,11 +1,23 @@
 using LinearAlgebraicRepresentation
 Lar = LinearAlgebraicRepresentation
-using Plasm
+#using Plasm
+using ViewerGL
+GL = ViewerGL
 import Base.show
 
 function show(filename)
 	V, EV = Plasm.svg2lar(filename)
-	Plasm.view(V,EV)
+	#Plasm.view(V,EV)
+	GL.VIEW([ GL.GLGrid(V,EV, GL.COLORS[1],1), GL.GLFrame2 ]);
+
+	#Plasm.view(V,EV)
+	return V, EV
+end
+
+
+function show(filename)
+	V, EV = Lar.svg2lar(filename)
+	GL.VIEW([ GL.GLLines(V,EV) ])
 	return V, EV
 end
 
