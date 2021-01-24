@@ -1,4 +1,6 @@
 # Plasm.jl
+[![Build Status](https://img.shields.io/travis/cvdlab/Plasm.jl/master.svg?label=Linux+/+macOS)](https://travis-ci.org/cvdlab/Plasm.jl)
+[![Coverage Status](https://coveralls.io/repos/github/cvdlab/Plasm.jl/badge.svg?branch=master)](https://coveralls.io/github/cvdlab/Plasm.jl?branch=master)
 
 Graphics module to visualize [LinearAlgebraicRepresentation.jl](https://github.com/cvdlab/LinearAlgebraicRepresentation.jl) structures via PyPLaSM python package.
 
