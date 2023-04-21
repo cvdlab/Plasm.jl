@@ -12,6 +12,6 @@ VV = [[k] for k=1:size(V,2)]
 
 model = (V, (VV,EV,FV))
 
-View(Plasm.numbering(2.)(model))
+View(Plasm.numbering(5)(model))
 
 View(Plasm.hpc_exploded( model )(1.5,1.5,1.5))

@@ -24,5 +24,5 @@ comps = [Plasm.lar2hpc(V,EV) for EV in EVs]::Array{Plasm.Hpc,1}
 using PyCall
 p = PyCall.pyimport("pyplasm")
 
-Plasm.view(p["STRUCT"]([hpccolors[k](comps[k]) for k=1:length(comps)]))
+Plasm.view(p.STRUCT([hpccolors[k](comps[k]) for k=1:length(comps)]))
 

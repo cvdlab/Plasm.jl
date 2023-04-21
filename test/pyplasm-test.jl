@@ -11,8 +11,8 @@ V,FV,EV  =  square
 function mkpol(verts::Lar.Points, cells::Lar.Cells)::Plasm.Hpc
    verts = Plasm.points2py(verts)
    cells = Plasm.cells2py(cells)
-   return p["MKPOL"]([verts,cells,[]])
+   return p.MKPOL([verts,cells,[]])
 end
 
 hpc = mkpol(V,EV)
-p["VIEW"](hpc)
+p.VIEW(hpc)

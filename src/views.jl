@@ -155,12 +155,12 @@ function mkpol( verts::Plasm.Points, cells::Plasm.Cells )::Plasm.Hpc
 	p = PyCall.pyimport("pyplasm")
 	Verts = Plasm.points2py(verts)
 	Cells = Plasm.cells2py(cells)
-	hpc = p["MKPOL"]([Verts,Cells,PyObject(true)])
+	hpc = p.MKPOL([Verts,Cells,PyObject(true)])
 	return hpc
 end
 function mkpol( hpcs::Array{Plasm.Hpc,1} )::Plasm.Hpc
 	p = PyCall.pyimport("pyplasm")
-	return p["MKPOL"](PyCall.PyVector(hpcs))
+	return p.MKPOL(PyCall.PyVector(hpcs))
 end
 
 
@@ -191,7 +191,7 @@ julia> Plasm.view(hpc)
 """
 function view(hpc)
 	p = PyCall.pyimport("pyplasm")
-	p["VIEW"](hpc)
+	p.VIEW(hpc)
 end
 
 
@@ -222,8 +222,8 @@ Plasm.view([ Plasm.color("cyan")(hpc1) , Plasm.color("magenta")(hpc2) ])
 """
 function view(hpcs::Array{PyCall.PyObject})
 	p = PyCall.pyimport("pyplasm")
-	hpc = p["STRUCT"](hpcs)
-	p["VIEW"](hpc)
+	hpc = p.STRUCT(hpcs)
+	p.VIEW(hpc)
 end
 
 
@@ -255,7 +255,7 @@ Plasm.view(Plasm.mkpol(V,CV))
 function view(V::Points, CV::Cells)
 	p = PyCall.pyimport("pyplasm")
 	hpc = lar2hpc(V::Points, CV::Cells)
-	p["VIEW"](hpc)
+	p.VIEW(hpc)
 end
 
 
@@ -320,7 +320,7 @@ julia> Plasm.view( (V,[VV,EV,FV,CV]) )
 function view(model::LARmodel)
 	p = PyCall.pyimport("pyplasm")
 	hpc = hpc_exploded(model::LARmodel)(1.2,1.2,1.2)
-	p["VIEW"](hpc)
+	p.VIEW(hpc)
 end
 
 
@@ -348,7 +348,7 @@ function view(pair::Tuple{Points,Cells})
 	V,CV = pair
 	p = PyCall.pyimport("pyplasm")
 	hpc = lar2hpc(V::Points, CV::Cells)
-	p["VIEW"](hpc)
+	p.VIEW(hpc)
 end
 
 
@@ -406,7 +406,7 @@ Plasm.view(scene)
 function view(scene::Array{Any,1})
 	if prod([isa(item[1:2],Lar.LAR) for item in scene])
 		p = PyCall.pyimport("pyplasm")
-		p["VIEW"](p["STRUCT"]([Plasm.lar2hpc(item[1],item[2]) for item in scene]))
+		p.VIEW(p.STRUCT([Plasm.lar2hpc(item[1],item[2]) for item in scene]))
 	end
 end
 
@@ -445,11 +445,11 @@ function hpc_exploded( model )
 				py_verts = Plasm.points2py(vcell)
 				py_cells = Plasm.cells2py( [collect(1:size(vcell,2))] )
 
-				hpc = p["MKPOL"]([ py_verts, py_cells, [] ])
+				hpc = p.MKPOL([ py_verts, py_cells, [] ])
 				push!(out, hpc)
 			end
 		end
-		hpc = p["STRUCT"](out)
+		hpc = p.STRUCT(out)
 		return hpc
 	end
 	return hpc_exploded0
@@ -494,10 +494,10 @@ function lar_exploded(model)
 			edges = [[vdict[e[1]], vdict[e[2]]] for e in cell]
 			py_cells = Plasm.cells2py( edges )
 
-			hpc = p["MKPOL"]([ py_verts, py_cells, [] ])
+			hpc = p.MKPOL([ py_verts, py_cells, [] ])
 			push!(out, hpc)
 		end
-		hpc = p["STRUCT"](out)
+		hpc = p.STRUCT(out)
 		return hpc
 	end
 	return lar_exploded0
@@ -590,7 +590,7 @@ Plasm.view(Plasm.lar2hpc(scene))
 """
 function lar2hpc(scene::Array{Any,1})::Hpc
 	p = PyCall.pyimport("pyplasm")
-	hpc = p["STRUCT"]([ mkpol(item[1],item[2]) for item in scene ])
+	hpc = p.STRUCT([ mkpol(item[1],item[2]) for item in scene ])
 end
 
 

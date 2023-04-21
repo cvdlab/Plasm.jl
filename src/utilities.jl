@@ -7,5 +7,5 @@ function array2list(cells)
 end
 
 function doublefirst(cells)
-	return p["AL"]([cells[1],cells])
+	return p.AL([cells[1],cells])
 end

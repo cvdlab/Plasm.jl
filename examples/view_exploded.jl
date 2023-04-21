@@ -15,7 +15,7 @@ model_1 = (geom_1,topol_1)
 model_2 = Lar.larModelProduct(model_0, model_1)
 model_3 = Lar.larModelProduct(model_2, model_1)
 
-p["VIEW"](Plasm.lar2hpc(model_3...))
+p.VIEW(Plasm.lar2hpc(model_3...))
 V,CV = model_3
 
 hpc = Plasm.hpc_exploded( (V,[CV]) )(1.5,1.5,1.5)
